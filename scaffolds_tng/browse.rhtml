@@ -1,0 +1,46 @@
+<h1><%= h(@model.scaffold_model_plural_name) %> auflisten</h1>
+<div id="scroll"></div>
+<%= link_to(image_tag("filenew.png") + " #{h(@model.scaffold_model_name)} neu erzeugen", :action=>'new') %>
+<script src="/javascripts/livegrid.js"></script>
+<script>
+new LiveGrid(document.getElementById("scroll"), {
+	url: '<%= url_for(:action=>'browse_data') %>',
+	header: {
+		fields:<%= header_fields_for(@model) %>,
+    numberOfColumns: function() {
+      return this.fields.length;
+    },
+    getFieldName: function(index) {
+      return this.fields[index][0];
+    },
+    getFieldSearch: function(index) {
+      return this.fields[index][1];
+    },
+    getQueryString: function(searchBelow) {
+      if (searchBelow==null)
+        return "";
+      var inputs = searchBelow.getElementsByTagName('input');
+      var params = [];
+      for (var i=0; i < inputs.length; i++) {
+        params.push(encodeURIComponent(inputs[i].name) + "=" + encodeURIComponent(inputs[i].value))
+      }
+      var selects = searchBelow.getElementsByTagName('select');
+      for (var i=0; i < selects.length; i++) {
+        var elem = selects[i];
+        for (var j=0; j < elem.options.length; j++) {
+          if (elem.options[j].selected==true) {
+            params.push(encodeURIComponent(elem.name) + "=" + encodeURIComponent(elem.options[j].value));
+          }
+        }
+      }
+      return params.join("&");
+    }
+  },
+	height: (Math.max(window.innerHeight - 260, 200) + "px")
+<% if @extra_params %>
+
+  ,extra_params: '<%= @extra_params %>'
+<% end %>
+
+});
+</script>
