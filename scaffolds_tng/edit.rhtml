@@ -1,0 +1,73 @@
+<h1><%= h(@instance.class.scaffold_model_name) %> bearbeiten</h1>
+<div id="tabs">
+  <ul>
+    <li><a href="#eigenschaften">Eigenschaften</a></li>
+    <% @tab_associations.each do |assoc| %>
+    <li><%= link_to(h(assoc.klass.scaffold_model_plural_name), "#tabcontent_#{assoc.name}") %></li>
+    <% end %>
+  </ul>
+  <div id="eigenschaften">
+    <% form_tag(:action=>'update', :id=>@instance.id) do %>
+      <%= record_form(@instance, @options) %>
+      <% if params.has_key?(:redirect_to) %>
+      <%= hidden_field_tag("redirect_to", params[:redirect_to]) %>
+      <% end %>
+      <%= submit_tag 'Speichern' %>
+    <% end %>
+
+    <%= link_to(image_tag("find.png") + " #{h(@instance.class.scaffold_model_plural_name)} auflisten", :action=>'browse') %>
+    <br>
+    <%= link_to(image_tag("filenew.png") + " #{h(@instance.class.scaffold_model_name)} neu erzeugen", :action=>'new') %>
+  </div>
+  <% @tab_associations.each do |assoc| %>
+  <div id="tabcontent_<%= assoc.name %>">
+  <%= content_tag('div', '',
+    :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.primary_key_name}]=#{@instance.id}",
+    :header_url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"headerspec"),
+    :url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"browse_data"),
+    :class=>'livegridDeferred'
+  ) %>
+  <%= content_tag('div', '', :class=>'newdialog', 
+        :title=>"#{h(assoc.klass.scaffold_model_name)} neu anlegen"
+) %>
+  <%= link_to(
+        image_tag("filenew.png") + " #{h(assoc.klass.scaffold_model_name)} neu anlegen", 
+        {
+          :action=>'new', 
+          :controller=>assoc.klass.name.underscore, 
+          "#{assoc.klass.name.underscore}[#{assoc.primary_key_name}]"=>@instance.id, 
+          :invisible_fields => [assoc.primary_key_name.to_s.sub(/_id$/, '')]
+        },
+        :class=>"newdialog") %>
+  </div>
+  <% end %>
+</div>
+<script>
+jQuery.noConflict();
+jQuery(document).ready(function($) {
+  jQuery("#tabs").tabs({
+    cache: true,
+    ajaxOptions: {cache:true},
+    select: function(event, ui) {
+      var livegrid = $(ui.panel).find(".livegridDeferred");
+      var dlg = $(ui.panel).find("div.newdialog");
+      dlg.dialog({ autoOpen: false, modal: true, width: "80%" });
+      livegrid.livegrid();
+      $(ui.panel).find("a.newdialog").click(function() {
+        $(this).each(function(){
+          dlg.dialog('open');
+          dlg.load(this.href, null, function(responseText, textStatus, xhr) {
+            $(this).inlineform(dlg, {
+              grid: livegrid
+            });
+            $(this).registerModifications();
+          });
+          return false;
+        });
+        return false;
+      }
+      );
+    }
+  });
+});
+</script>
