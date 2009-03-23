@@ -1,0 +1,3 @@
+<h1><%= h(@instance.class.scaffold_model_name) %> anzeigen</h1>
+<%= record_show(@instance) %>
+<%= link_to (image_tag("edit.png") + " #{h(@instance.class.scaffold_model_name)} bearbeiten", :action=>'edit', :id=>@instance.id) %>
