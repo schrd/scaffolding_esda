@@ -49,7 +49,10 @@ module Esda::Scaffolding::ScaffoldHelper
   def header_fields_for(model_class)
  		([['Verknüpfungen', '<a class="button" onclick="findLiveGridAround(this).grid.search();">Suchen</a>']] +
 		model_class.scaffold_browse_fields.map{|f|
-			[scaffold_field_name(model_class, f), input_search(model_class, f).to_s, f]
+      [scaffold_field_name(model_class, f), 
+        input_search(model_class, f).to_s, 
+        f, 
+        (model_class.scaffold_column_options(f.to_s)['search']['width'] rescue nil)]
 		}).to_json
   end
   def has_many_links(row)
@@ -151,7 +154,6 @@ module Esda::Scaffolding::ScaffoldHelper
     rescue
       size = {}
     end
-
     tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}]", 'id'=> "#{prefix}_#{record_name}_#{column}", 'value'=>value}.merge(size))
   end
   def to_date_search_field_tag(record_name, column, prefix, value, options)

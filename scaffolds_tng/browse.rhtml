@@ -1,7 +1,6 @@
 <h1><%= h(@model.scaffold_model_plural_name) %> auflisten</h1>
 <div id="scroll"></div>
 <%= link_to(image_tag("filenew.png") + " #{h(@model.scaffold_model_name)} neu erzeugen", :action=>'new') %>
-<script src="/javascripts/livegrid.js"></script>
 <script>
 new LiveGrid(document.getElementById("scroll"), {
 	url: '<%= url_for(:action=>'browse_data') %>',
