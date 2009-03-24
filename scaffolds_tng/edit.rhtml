@@ -18,6 +18,30 @@
     <%= link_to(image_tag("find.png") + " #{h(@instance.class.scaffold_model_plural_name)} auflisten", :action=>'browse') %>
     <br>
     <%= link_to(image_tag("filenew.png") + " #{h(@instance.class.scaffold_model_name)} neu erzeugen", :action=>'new') %>
+    <% if @inline_association %>
+      <div class="inlineassoc">
+      <% assoc = @inline_association %>
+      <h2><%= h(assoc.klass.scaffold_model_plural_name) %></h2>
+      <%= content_tag('div', '',
+        :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.primary_key_name}]=#{@instance.id}",
+        :header_url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"headerspec"),
+        :url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"browse_data"),
+        :class=>'livegrid'
+      ) %>
+      <%= content_tag('div', '', :class=>'newdialog', 
+            :title=>"#{h(assoc.klass.scaffold_model_name)} neu anlegen"
+    ) %>
+      <%= link_to(
+            image_tag("filenew.png") + " #{h(assoc.klass.scaffold_model_name)} neu anlegen", 
+            {
+              :action=>'new', 
+              :controller=>assoc.klass.name.underscore, 
+              "#{assoc.klass.name.underscore}[#{assoc.primary_key_name}]"=>@instance.id, 
+              :invisible_fields => [assoc.primary_key_name.to_s.sub(/_id$/, '')]
+            },
+            :class=>"newdialog") %>
+      </div>
+    <% end %>
   </div>
   <% @tab_associations.each do |assoc| %>
   <div id="tabcontent_<%= assoc.name %>">
@@ -69,5 +93,23 @@ jQuery(document).ready(function($) {
       );
     }
   });
+  var livegrid = jQuery(".inlineassoc .livegrid");
+  var dlg = jQuery(".inlineassoc div.newdialog");
+  dlg.dialog({ autoOpen: false, modal: true, width: "80%" });
+  jQuery(".inlineassoc a.newdialog").click(function() {
+    jQuery(this).each(function(){
+      dlg.dialog('open');
+      dlg.load(this.href, null, function(responseText, textStatus, xhr) {
+        jQuery(this).inlineform(dlg, {
+          grid: livegrid
+        });
+        jQuery(this).registerModifications();
+      });
+      return false;
+    });
+    return false;
+  }
+  );
+
 });
 </script>
