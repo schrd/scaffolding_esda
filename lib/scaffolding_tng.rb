@@ -61,7 +61,7 @@ class ActionController::Base
     if self.respond_to?(:set_legacy_vars)
       set_legacy_vars
     end
-    layout = request.xhr? ? false : 'esda_tng'
+    layout = request.xhr? ? false : 'esda'
     if template_exists?("#{self.class.controller_path}/#{action}")
       render(options.merge({:action=>action, :layout=>layout}))
     else
