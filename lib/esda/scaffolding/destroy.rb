@@ -6,7 +6,7 @@ module Esda::Scaffolding::Destroy
       if params.has_key?(:redirect_to)
         return(redirect_to(params[:redirect_to]))
       end
-      render(:inline=>'Datensatz gelöscht', :layout=>(request.xhr? ? false : 'esda_tng'))
+      render(:inline=>'Datensatz gelöscht', :layout=>(request.xhr? ? false : 'esda'))
     rescue ActiveRecord::RecordNotFound
       render :inline=>'Datensatz nicht gefunden', :status=>404
     end
