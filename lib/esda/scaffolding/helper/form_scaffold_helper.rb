@@ -202,7 +202,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         text_area_tag(html_name(model, field, name_prefix), record.send(field), html_options)
       when :boolean
         select_tag(html_name(model, field, name_prefix),
-                   options_for_select([["", nil], ["Ja", "true"],["Nein", "false"]], record.send(field).to_s),
+                   options_for_select([["", nil], ["Ja", "t"],["Nein", "f"]], record.send(field).to_s.slice(0...1)),
                    :class=>css_class,
                    :id=>html_id(model, field, name_prefix) 
                   )
