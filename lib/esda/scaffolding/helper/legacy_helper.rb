@@ -1,17 +1,23 @@
 module Esda::Scaffolding::Helper::LegacyHelper
   def scaffold_form(action)
-    varname = @instance.class.name.underscore
-    if instance_variable_get("@#{varname}").nil?
-      instance_variable_set("@#{varname}", @instance)
+    if @scaffold_singular_object
+      inst = @scaffold_singular_object
+    elsif @scaffold_singular_name
+      inst = instance_variable_get("@#{@scaffold_singular_name}")
+    else
+      inst = @instance
     end
     if action == 'create'
       aktion = 'anlegen'
     else
       aktion = 'ändern'
     end
-    form_text = form(@scaffold_singular_name, :action=>"#{action}#{@scaffold_suffix}", :submit_value=>"#{@scaffold_singular_name.humanize} #{aktion}") do |f|
-    	f << hidden_field_tag('redirect_to', params[:redirect_to]) if params[:redirect_to].to_s != ''
-    end
+    out = form_tag(:action=>action, :id=>inst.id)
+    out << record_form(inst)
+    out << hidden_field_tag('redirect_to', params[:redirect_to]) if params[:redirect_to].to_s != ''
+    out << submit_tag(aktion)
+    out << "</form>"
+    out
   end
   def manage_link
   end
