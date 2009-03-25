@@ -156,7 +156,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         else
           inlinenew = ""
         end
-        if count < 100
+        if count < 100 and (model.scaffold_column_options(field.to_s)['custom_renderer'] != :hidden_inline_browser rescue true)
           return content_tag('div', 
             association_select_tag(record, assoc, conditions, condition_params, name_prefix, css_class) + 
               content_tag('span', '', 
@@ -181,7 +181,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
               :title=>"#{assoc.klass.scaffold_model_name} auswählen",
               :url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'browse_data'),
               :header_url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'headerspec'),
-              :selected_text=>(record.send(assoc.name).scaffold_name rescue 'nix')
+              :selected_text=>(record.send(assoc.name).scaffold_name rescue '&nbsp;&nbsp;&nbsp;')
             ) + inlinenew,
             :class=>'association'
           )
@@ -228,7 +228,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
   def association_select_tag(record, assoc, conditions, condition_params, name_prefix, css_class)
     model = record.class
     select_tag(html_name(model, assoc.primary_key_name, name_prefix), 
-      options_for_select([[assoc.klass.scaffold_model_name + " wählen...", ""]] + 
+      options_for_select([["", ""]] + 
         assoc.klass.find(:all, 
           :conditions=>[conditions.join(" AND "), *condition_params], 
           :order=>assoc.klass.scaffold_select_order
