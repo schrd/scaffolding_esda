@@ -6,7 +6,7 @@ module RecursiveCreator
     created_objects = {}
     associations.each {|assoc|
       # only create new association instance if there is no id assigned and parameters exist
-      if params_part and params_part.has_key?(assoc.name) and params_part[assoc.name].is_a?(Hash) and params_part[assoc.primary_key_name].nil?
+      if params_part and params_part.has_key?(assoc.name) and params_part[assoc.name].is_a?(Hash) and params_part[assoc.primary_key_name].blank?
         created_objects[assoc.name] = recursively_create(assoc.klass, params_part[assoc.name])
       end
     }
