@@ -18,6 +18,14 @@ class ActionController::Base
     if add_methods.is_a?(Symbol)
       add_methods = [add_methods]
     end
+    if options[:except]
+      no_methods = options[:except]
+      if no_methods.is_a?(Symbol)
+        no_methods = [no_methods]
+      end
+      add_methods -= no_methods
+    end
+
     module_eval <<-"end_eval", __FILE__, __LINE__
       include Esda::Scaffolding::Helper::FormScaffoldHelper
       helper :"Esda::Scaffolding::Helper::FormScaffold"
