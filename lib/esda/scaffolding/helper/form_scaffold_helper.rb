@@ -158,7 +158,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         end
         if count < 100
           return content_tag('div', 
-            association_select_tag(record, assoc, conditions, condition_params, name_prefix) + 
+            association_select_tag(record, assoc, conditions, condition_params, name_prefix, css_class) + 
               content_tag('span', '', 
                 :class=>'inlineshow', 
                 :title=>"#{assoc.klass.scaffold_model_name} anzeigen",
@@ -225,7 +225,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
   # creates a select box for the +has_many+ association assoc
   # displayed values are determined by calling the +scaffold_name+ method of each instance
   # entries are ordered by +scaffold_select_order+ of the associated model
-  def association_select_tag(record, assoc, conditions, condition_params, name_prefix)
+  def association_select_tag(record, assoc, conditions, condition_params, name_prefix, css_class)
     model = record.class
     select_tag(html_name(model, assoc.primary_key_name, name_prefix), 
       options_for_select([[assoc.klass.scaffold_model_name + " wählen...", ""]] + 
@@ -237,6 +237,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         }, 
         record.send(assoc.primary_key_name)
       ),
+      :class=>css_class,
       :id=>html_id(model, assoc.primary_key_name, name_prefix)
     )
   end
