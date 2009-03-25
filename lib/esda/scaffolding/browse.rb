@@ -11,10 +11,11 @@ module Esda::Scaffolding::Browse
       hash = params[:search][@model.name.underscore.to_sym].dup.delete_if{|k,v| 
         not @model.scaffold_no_browse_columns.include?(k.to_s)
       }
+      logger.debug("extra hash: #{hash.inspect}")
 
-      @extra_params = hash.map{|k,v| "search[#{@model.name.underscore}][#{k}]=#{v}"}.join("&")
+      @extra_params = hash.map{|k,v| "search[#{@model.name.underscore}][#{k}]=#{URI.encode(v, /[^a-zA-Z0-9.,]/)}"}.join("&")
     end
-    @extra_params = [@extra_param, "link=true"].compact.join("&")
+    @extra_params = [@extra_params, "link=true"].compact.join("&")
     #expires_in 60.minutes
     render_scaffold_tng('browse')
   end
