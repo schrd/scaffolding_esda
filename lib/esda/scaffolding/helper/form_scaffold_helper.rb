@@ -58,7 +58,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       content_tag('table',
         fields.map{|f|
           field_element = nil
-          if fixed_fields.include?(f)
+          if fixed_fields.include?(f) or (record.respond_to?("#{f}_immutable?") and record.send("#{f}_immutable?"))
             field_element = scaffold_value(record, f)
           else
             field_element = scaffold_field(record, f, name_prefix)

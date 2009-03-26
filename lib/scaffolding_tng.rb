@@ -11,7 +11,7 @@ class ActionController::Base
     end_eval
   end
   def self.scaffold_tng(model_id, options={})
-    class_name = model_id.to_s.underscore.singularize.camelize
+    class_name = model_id.to_s.underscore.camelize
     params_name = model_id.to_s.underscore
     options.assert_valid_keys(:except, :only, :habtm)
     add_methods = options[:only] ? options[:only] : [:browse, :new, :edit, :show, :destroy]
