@@ -50,10 +50,12 @@ module Esda::Scaffolding::Edit
           recursively_save_created_objects(@instance, created_objects)
         end
         if params.has_key?(:redirect_to)
+          flash[:notice] = "Datensatz gespeichert"
           return(redirect_to(params[:redirect_to]))
         end
+        flash.now[:notice] = "Datensatz gespeichert"
       rescue Exception=>e
-        flash.now[:errors] = e
+        flash.now[:error] = e
         @instance, created_objects = recursively_update(@instance, params[params_name])
         status=422
       end
