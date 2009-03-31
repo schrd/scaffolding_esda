@@ -197,21 +197,26 @@ module Esda::Scaffolding::ScaffoldHelper
     if options.has_key?(:to)
       to = options[:to]
     end
+    begin
+      size = { :size => record_name.classify.constantize.scaffold_column_options(column.to_s)['search']['size']}
+    rescue
+      size = { :size=>5 }
+    end
     zusammen = "<br />"
     zusammen = " " if options.has_key?(:break) and options[:break]==false
     from +
       tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}][from]", 
                       'id'=> "#{prefix}_#{record_name}_#{column}_from", 
           'value'=>(value[:from] rescue nil),
-          'class'=>'number_from',
-          'size'=>'5'}) + 
+          'class'=>'number_from'
+          }.merge(size)) + 
         zusammen +
   to +
   tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}][to]", 
                       'id'=> "#{prefix}_#{record_name}_#{column}_to", 
           'value'=>(value[:to] rescue nil),
           'class'=>'number_to',
-          'size'=>'5'}) 
+          }.merge(size)) 
       end
       def to_belongs_to_search_field_tag(record_class, record_name, column, column_name, prefix, value, options)
         desc = (record_class.reflect_on_association(column_name.to_sym).klass.find(value).scaffold_name rescue nil)
