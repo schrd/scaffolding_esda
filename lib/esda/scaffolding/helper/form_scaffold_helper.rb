@@ -6,6 +6,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
   # valid options are:
   # * <tt>:name_prefix</tt>  a query string prefix that is passed to the +html_name+ method
   # * <tt>:invisible_fields</tt> lists fields which are not displayed
+  # * <tt>:timestamps</tt> shows created/updated_by/at fields if set to true
   def record_show(record, options={})
     if respond_to?("#{record.class.name.underscore}_record_show")
       return send("#{record.class.name.underscore}_record_show", record, options)
@@ -16,6 +17,36 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       fixed_fields = options[:fixed_fields] || []
       invisible_fields = options[:invisible_fields] || []
       fields -= invisible_fields
+      timestamps = ""
+      if options[:timestamps]
+        user_text = []
+        if record.respond_to?(:updated_by)
+          if record.updated_by.is_a?(User)
+            user_text << record.updated_by.login
+          elsif record.updated_by.is_a?(Numeric)
+            user_text << User.find(record.updated_by).login
+          end
+        end
+        if record.respond_to?(:updated_at)
+          user_text << record.updated_at.strftime("%d.%m.%Y %H:%M:%S")
+        end
+        if user_text.length == 0
+          if record.respond_to?(:created_by)
+            if record.created_by.is_a?(User)
+              user_text << record.created_by.login
+            elsif record.created_by.is_a?(Numeric)
+              user_text << User.find(record.created_by).login
+            end
+          end
+          if record.respond_to?(:created_at)
+            user_text << record.created_at.strftime("%d.%m.%Y %H:%M:%S")
+          end
+        end
+        timestamps << content_tag('tr', 
+            content_tag('th', 'Zuletzt geändert') +
+            content_tag('td', user_text.join(" "))
+          )
+      end
       content_tag('div',
         content_tag('table',
           fields.map{|f|
@@ -24,13 +55,13 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
               content_tag('th', scaffold_field_name(record, f) + ":") +
               content_tag('td', field_element)
             )
-          }.join(),
+          }.join() + timestamps,
           :class=>"record-show"
         ) 
       ) 
     end
   end
-  # scaffold a record instance for show
+  # scaffold a record instance for edit
   # valid options are:
   # * <tt>:name_prefix</tt>  a query string prefix that is passed to the +html_name+ method
   # * <tt>:fixed_fields</tt> lists fields which are immutable
