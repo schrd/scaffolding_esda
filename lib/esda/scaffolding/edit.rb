@@ -17,6 +17,11 @@ module Esda::Scaffolding::Edit
       else
         @inline_association = nil
       end
+      @habtm_associations = model_class.reflect_on_all_associations.find_all{|a| 
+        a.macro==:has_and_belongs_to_many
+      }.sort_by{|a| 
+        a.name.to_s.humanize
+      }
       if params[:inline].to_i==1
         render :inline=>"<%= record_form(@instance) %>"
       else
@@ -40,6 +45,11 @@ module Esda::Scaffolding::Edit
       else
         @inline_association = nil
       end
+      @habtm_associations = model_class.reflect_on_all_associations.find_all{|a| 
+        a.macro==:has_and_belongs_to_many
+      }.sort_by{|a| 
+        a.name.to_s.humanize
+      }
       @instance, created_objects = recursively_update(@instance, params[params_name])
       @options = {}
       @options[:fixed_fields] = params[:fixed_fields] if params.has_key?(:fixed_fields)

@@ -29,6 +29,10 @@ module Esda::Scaffolding::Browse
 
     params_part = (params[:search][model.name.underscore.to_sym] rescue nil)
     conditions, condition_params = build_conditions(model, params_part) if params_part
+    handle_browse_data(model, conditions, condition_params)
+  end
+  private
+  def handle_browse_data(model, conditions, condition_params)
     @count = model.count(:conditions=>[conditions.join(" AND "), *condition_params], :include=>model.browse_include_fields2[0])
     @link = false
     @link = true if params.has_key?(:link)
@@ -70,8 +74,8 @@ module Esda::Scaffolding::Browse
     t4 = Time.now
     render :json=>json
     t2 = Time.now
-    logger.debug("Request time: #{t2-t}, davon json rendern: #{t4-t3}")
   end
+  public
   # delivers the header specification for livegrid
   def headerspec
     @model = model_class

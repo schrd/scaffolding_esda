@@ -1,0 +1,50 @@
+<h1>Bearbeite <%= h @assoc.name.to_s.humanize %> von <%= h @instance.scaffold_name %></h1>
+<h2>Zugeordnete <%= h @assoc.name.to_s.humanize%> - Klicken Sie auf eine <%= h @assoc.name.to_s.humanize.singularize %> zum entfernen</h2>
+<div id="zugeordnet"></div>
+<h2>Nicht zugeordnete <%= h @assoc.name.to_s.humanize%> - Klicken Sie auf eine <%= h @assoc.name.to_s.humanize.singularize %> zum hinzufügen</h2>
+<div id="nicht_zugeordnet"></div>
+<script>
+  var header = new HeaderBase();
+  header.fields = <%= header_fields_for(@assoc.klass) %>;
+  new LiveGrid(document.getElementById("zugeordnet"), {
+    header: header,
+    url: '<%= url_for(:action=>"browse_associated_#{@assoc.name.to_s}", :id=>@instance.id) %>',
+    rowClickHandler: function(event, grid, line, row) {
+      var row_data = grid.getRowData(row);
+      var id = row_data[row_data.length-1];
+      var name = row_data[row_data.length-2];
+      jQuery.ajax({url:'<%= url_for(:action=>"del_#{@assoc.name.to_s}", :id=>@instance.id)%>',
+        success: function() {
+          jQuery("#log").append(name + " entfernt");
+          jQuery("#zugeordnet")[0].grid.reload();
+          jQuery("#nicht_zugeordnet")[0].grid.reload();
+        },
+        error: function() {
+          jQuery("log").append(name + " entfernen fehlgeschlagen");
+        },
+        data: {del: id}
+      });
+    }
+  });
+  new LiveGrid(document.getElementById("nicht_zugeordnet"), {
+    header: header,
+    url: '<%= url_for(:action=>"browse_unassociated_#{@assoc.name.to_s}", :id=>@instance.id) %>',
+    rowClickHandler: function(event, grid, line, row) {
+      var row_data = grid.getRowData(row);
+      var id = row_data[row_data.length-1];
+      var name = row_data[row_data.length-2];
+      jQuery.ajax({url:'<%= url_for(:action=>"add_#{@assoc.name.to_s}", :id=>@instance.id)%>',
+        success: function() {
+          jQuery("#log").append(name + " hinzugefügt");
+          jQuery("#zugeordnet")[0].grid.reload();
+          jQuery("#nicht_zugeordnet")[0].grid.reload();
+        },
+        error: function() {
+          jQuery("log").append(name + " hinzugefügen fehlgeschlagen");
+        },
+        data: {add: id}
+      });
+    }
+  });
+</script>
+<div id="log"></div>
