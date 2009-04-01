@@ -8,6 +8,7 @@
                     link_to('<img src="/images/filefind.png">', :action=>'show', :id=>row.id) + 
                     link_to('<img src="/images/edit.png">', :action=>'edit', :id=>row.id) + 
                     link_to('<img src="/images/editdelete.png">', :action=>'destroy', :id=>row.id) +
+                    (controller.respond_to?(:umsatz) ? link_to("&euro;", :action=>:umsatz, :id=>row.id) : "") +
                     has_many_links(row)
                   ] +
                   @model.scaffold_browse_fields.map{|field|
