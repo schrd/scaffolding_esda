@@ -5,10 +5,10 @@
                 :offset=>params[:offset].to_i,
                 :data=>@daten.map{|row|
                   [ 
-                    link_to('<img src="/images/filefind.png">', :action=>'show', :id=>row.id, :controller=>row.class.name.underscore) + 
-                    link_to('<img src="/images/edit.png">', :action=>'edit', :id=>row.id, :controller=>row.class.name.underscore) + 
-                    link_to('<img src="/images/editdelete.png">', :action=>'destroy', :id=>row.id, :controller=>row.class.name.underscore) +
-                    (controller.respond_to?(:umsatz) ? link_to("&euro;", :action=>:umsatz, :id=>row.id, :controller=>row.class.name.underscore) : "") +
+                    link_to('<img src="/images/filefind.png">', {:action=>'show', :id=>row.id, :controller=>row.class.name.underscore}, :title=>'Anzeigen') + 
+                    link_to('<img src="/images/edit.png">', {:action=>'edit', :id=>row.id, :controller=>row.class.name.underscore}, :title=>'Bearbeiten') + 
+                    link_to('<img src="/images/editdelete.png">', {:action=>'destroy', :id=>row.id, :controller=>row.class.name.underscore}, :title=>'Löschen') +
+                    (controller.respond_to?(:umsatz) ? link_to("&euro;", {:action=>:umsatz, :id=>row.id, :controller=>row.class.name.underscore}, :title=>'Umsatz') : "") +
                     has_many_links(row)
                   ] +
                   @model.scaffold_browse_fields.map{|field|
