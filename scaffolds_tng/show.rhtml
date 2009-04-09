@@ -1,4 +1,70 @@
 <h1><%= h(@instance.class.scaffold_model_name) %> anzeigen</h1>
-<%= record_show(@instance, {:timestamps=>true}) %>
-<%= link_to (image_tag("edit.png") + " #{h(@instance.class.scaffold_model_name)} bearbeiten", :action=>'edit', :id=>@instance.id) %>
-<%= link_to (image_tag("editcopy.png") + " #{h(@instance.class.scaffold_model_name)} kopieren", :action=>'new', :clone_from=>@instance.id) %>
+<div id="tabs">
+  <ul>
+    <li><a href="#eigenschaften">Eigenschaften</a></li>
+    <% @tab_associations.each do |assoc| %>
+    <li><%= link_to(h(assoc.klass.scaffold_model_plural_name), "#tabcontent_#{assoc.name}") %></li>
+    <% end %>
+  </ul>
+  <div id="eigenschaften">
+    <%= record_show(@instance, {:timestamps=>true}) %>
+    <%= link_to(image_tag("find.png") + " #{h(@instance.class.scaffold_model_plural_name)} auflisten", :action=>'browse') %>
+    <br/>
+    <%= link_to (image_tag("edit.png") + " #{h(@instance.class.scaffold_model_name)} bearbeiten", :action=>'edit', :id=>@instance.id) %>
+    <br/>
+    <%= link_to (image_tag("editcopy.png") + " #{h(@instance.class.scaffold_model_name)} kopieren", :action=>'new', :clone_from=>@instance.id) %>
+  </div>
+  <% @tab_associations.each do |assoc| %>
+  <div id="tabcontent_<%= assoc.name %>">
+    <%= has_many_association_tab(assoc) %>
+  </div>
+  <% end %>
+</div>
+<script>
+jQuery.noConflict();
+jQuery(document).ready(function($) {
+  jQuery("#tabs").tabs({
+    cache: true,
+    ajaxOptions: {cache:true},
+    select: function(event, ui) {
+      var livegrid = $(ui.panel).find(".livegridDeferred");
+      var dlg = $(ui.panel).find("div.newdialog");
+      dlg.dialog({ autoOpen: false, modal: true, width: "80%" });
+      livegrid.livegrid();
+      $(ui.panel).find("a.newdialog").click(function() {
+        $(this).each(function(){
+          dlg.dialog('open');
+          dlg.load(this.href, null, function(responseText, textStatus, xhr) {
+            $(this).inlineform(dlg, {
+              grid: livegrid
+            });
+            $(this).registerModifications();
+          });
+          return false;
+        });
+        return false;
+      }
+      );
+    }
+  });
+  var livegrid = jQuery(".inlineassoc .livegrid");
+  var dlg = jQuery(".inlineassoc div.newdialog");
+  dlg.dialog({ autoOpen: false, modal: true, width: "80%" });
+  jQuery(".inlineassoc a.newdialog").click(function() {
+    jQuery(this).each(function(){
+      dlg.dialog('open');
+      dlg.load(this.href, null, function(responseText, textStatus, xhr) {
+        jQuery(this).inlineform(dlg, {
+          grid: livegrid
+        });
+        jQuery(this).registerModifications();
+      });
+      return false;
+    });
+    return false;
+  }
+  );
+
+});
+</script>
+
