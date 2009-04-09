@@ -1,3 +1,4 @@
 <h1><%= h(@instance.class.scaffold_model_name) %> anzeigen</h1>
 <%= record_show(@instance, {:timestamps=>true}) %>
 <%= link_to (image_tag("edit.png") + " #{h(@instance.class.scaffold_model_name)} bearbeiten", :action=>'edit', :id=>@instance.id) %>
+<%= link_to (image_tag("editcopy.png") + " #{h(@instance.class.scaffold_model_name)} kopieren", :action=>'new', :clone_from=>@instance.id) %>

@@ -179,6 +179,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
                                          :url=>url_for( params.merge({
                                            :controller=>assoc.klass.name.underscore, 
                                            :action=>'new', 
+                                           :clone_from=>nil,
                                            :inline=>1, 
                                            :name_prefix=>html_name(model, assoc.name, name_prefix)                                                                     })
                                          ),

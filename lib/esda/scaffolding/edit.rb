@@ -7,7 +7,7 @@ module Esda::Scaffolding::Edit
       @options[:fixed_fields] = params[:fixed_fields] if params.has_key?(:fixed_fields)
       @options[:invisible_fields] = params[:invisible_fields] if params.has_key?(:invisible_fields)
       @tab_associations = model_class.reflect_on_all_associations.find_all{|a| 
-        a.macro==:has_many
+        a.macro==:has_many and not a.options.has_key?(:through)
       }.sort_by{|a| 
         a.name.to_s.humanize
       }
@@ -35,7 +35,7 @@ module Esda::Scaffolding::Edit
     begin
       @instance = model_class.find(params[:id])
       @tab_associations = model_class.reflect_on_all_associations.find_all{|a| 
-        a.macro==:has_many
+        a.macro==:has_many and not a.options.has_key?(:through)
       }.sort_by{|a| 
         a.name.to_s.humanize
       }
