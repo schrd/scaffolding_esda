@@ -12,16 +12,16 @@ module Esda::Scaffolding::ScaffoldHelper
       if column_options['render'] == :inline
         if (entry.send(column.to_s))
           render_component(:controller=>reflection.class_name.underscore.to_s, :action=>'showinline', :params=>{:column_name=>column.to_s, :idid =>(entry.send(column.to_s).id rescue nil)})
-	end
+        end
       else
         id = entry.send(reflection.primary_key_name)
-	value = nil
+        value = nil
         if cache.is_a?(Hash) 
           cachekey = reflection.primary_key_name
-	  cache[cachekey] = {} unless cache.has_key?(cachekey) 
-	  if cache[cachekey].has_key?(id)
-	    value = cache[cachekey][id]
-	  else
+          cache[cachekey] = {} unless cache.has_key?(cachekey) 
+          if cache[cachekey].has_key?(id)
+            value = cache[cachekey][id]
+          else
             value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
             cache[cachekey][id] = value
 	  end
@@ -168,14 +168,6 @@ module Esda::Scaffolding::ScaffoldHelper
              'class'=>"date_#{kind}",
                                'size'=>10}
                     )
-#          ret += content_tag('a', '...', {'id'=>"#{prefix}_#{record_name}_#{column}_#{kind}_button", 'class'=>'button'}) 
-#          ret += javascript_tag("Calendar.setup({
-#  inputField  : '#{prefix}_#{record_name}_#{column}_#{kind}',
-#             ifFormat    : '%d.%m.%Y',
-#               button      : '#{prefix}_#{record_name}_#{column}_#{kind}_button',
-#  firstDay    : 1,
-#  eventName   : 'click'
-#}); ")
         }.join(zusammen)
 
   end
@@ -212,28 +204,28 @@ module Esda::Scaffolding::ScaffoldHelper
           'value'=>(value[:from] rescue nil),
           'class'=>'number_from'
           }.merge(size)) + 
-        zusammen +
-  to +
-  tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}][to]", 
+    zusammen +
+    to +
+      tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}][to]", 
                       'id'=> "#{prefix}_#{record_name}_#{column}_to", 
           'value'=>(value[:to] rescue nil),
           'class'=>'number_to',
           }.merge(size)) 
-      end
-      def to_belongs_to_search_field_tag(record_class, record_name, column, column_name, prefix, value, options)
-        desc = (record_class.reflect_on_association(column_name.to_sym).klass.find(value).scaffold_name rescue nil)
-  if (options[:display] == :all rescue false)
-    myclass = record_class.reflect_on_association(column_name.to_sym).klass
-    select_tag "#{prefix}[#{record_name}][#{column}]", 
-      options_for_select([["egal", ""]] + 
-        myclass.find(:all, :order => myclass.scaffold_select_order).collect {|elem| [elem.scaffold_name, elem.id]}
-      )
-        elsif value and desc
-          options  = content_tag('option', desc, {'value'=>value})
-          options += content_tag('option', "Egal", {'value'=>''})
-          content_tag('select', options, 
-      {"name" => "#{prefix}[#{record_name}][#{column}]", 
-       'id'   => "#{prefix}_#{record_name}_#{column}", 'value'=>value})
   end
-end
+  def to_belongs_to_search_field_tag(record_class, record_name, column, column_name, prefix, value, options)
+    desc = (record_class.reflect_on_association(column_name.to_sym).klass.find(value).scaffold_name rescue nil)
+    if (options[:display] == :all rescue false)
+      myclass = record_class.reflect_on_association(column_name.to_sym).klass
+      select_tag "#{prefix}[#{record_name}][#{column}]", 
+        options_for_select([["egal", ""]] + 
+          myclass.find(:all, :order => myclass.scaffold_select_order).collect {|elem| [elem.scaffold_name, elem.id]}
+        )
+          elsif value and desc
+            options  = content_tag('option', desc, {'value'=>value})
+            options += content_tag('option', "Egal", {'value'=>''})
+            content_tag('select', options, 
+        {"name" => "#{prefix}[#{record_name}][#{column}]", 
+         'id'   => "#{prefix}_#{record_name}_#{column}", 'value'=>value})
+    end
+  end
 end
