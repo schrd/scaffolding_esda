@@ -228,4 +228,24 @@ module Esda::Scaffolding::ScaffoldHelper
          'id'   => "#{prefix}_#{record_name}_#{column}", 'value'=>value})
     end
   end
+  def has_many_association_tab(assoc)
+    content_tag('div', '',
+      :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.primary_key_name}]=#{@instance.id}",
+      :header_url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"headerspec"),
+      :url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"browse_data"),
+      :class=>'livegridDeferred'
+    ) +
+    content_tag('div', '', :class=>'newdialog', 
+      :title=>"#{h(assoc.klass.scaffold_model_name)} neu anlegen"
+    ) +
+    link_to(
+      image_tag("filenew.png") + " #{h(assoc.klass.scaffold_model_name)} neu anlegen", 
+      {
+        :action=>'new', 
+        :controller=>assoc.klass.name.underscore, 
+        "#{assoc.klass.name.underscore}[#{assoc.primary_key_name}]"=>@instance.id, 
+        :invisible_fields => [assoc.primary_key_name.to_s.sub(/_id$/, '')]
+      },
+      :class=>"newdialog") 
+  end
 end
