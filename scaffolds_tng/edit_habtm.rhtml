@@ -3,6 +3,9 @@
 <div id="zugeordnet"></div>
 <h2>Nicht zugeordnete <%= h @assoc.name.to_s.humanize%> - Klicken Sie auf eine <%= h @assoc.name.to_s.humanize.singularize %> zum hinzufügen</h2>
 <div id="nicht_zugeordnet"></div>
+<%= link_to(image_tag("filenew.png") + " #{h(@assoc.name.to_s.singularize.humanize)} anlegen", :action=>'new', :controller=>@assoc.klass.name.underscore, :redirect_to=>url_for()) %>
+<br/>
+<%= link_to(image_tag("edit.png") + " Zurück zu #{h(@instance.scaffold_name)}", :action=>'edit', :id=>@instance.id, :controller=>@instance.class.name.underscore) %>
 <script>
   var header = new HeaderBase();
   header.fields = <%= header_fields_for(@assoc.klass) %>;

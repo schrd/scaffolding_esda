@@ -14,7 +14,10 @@ module Esda::Scaffolding::New
     else
       p = params[params_name]
     end
-    @instance, created_objects = recursively_create(model_class, p)
+    if params.has_key?(:clone_from)
+      @clone = model_class.find(params[:clone_from])
+    end
+    @instance, created_objects = recursively_create(model_class, p, @clone)
     @options = {:hide_validation_errors=>true}
     @options[:fixed_fields] = params[:fixed_fields] if params.has_key?(:fixed_fields)
     @options[:invisible_fields] = params[:invisible_fields] if params.has_key?(:invisible_fields)
