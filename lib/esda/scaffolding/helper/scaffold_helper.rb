@@ -1,5 +1,6 @@
 module Esda::Scaffolding::ScaffoldHelper
   # Returns associated object's scaffold_name if column is an association, otherwise returns column value.
+  #
   def scaffold_value(entry, column, link=true, cache=nil)
     return "" if entry.nil?
     if (column.to_s =~ /\./)
@@ -24,12 +25,12 @@ module Esda::Scaffolding::ScaffoldHelper
           else
             value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
             cache[cachekey][id] = value
-	  end
-	else
+          end
+        else
           value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
-	end
-	return link_to(h(value), :action=>'show', :controller=>reflection.class_name.underscore.to_s, :id=>id) if value and link
-	return h(value.to_s) + content_tag('span', '', :class=>'inlineshow', :url=>url_for(:action=>'show', :controller=>"/"+reflection.class_name.underscore.to_s, :id=>id), :title=>reflection.class_name.humanize) if not link 
+        end
+        return link_to(h(value), :action=>'show', :controller=>reflection.class_name.underscore.to_s, :id=>id) if value and link
+        return h(value.to_s) + content_tag('span', '', :class=>'inlineshow', :url=>url_for(:action=>'show', :controller=>"/"+reflection.class_name.underscore.to_s, :id=>id), :title=>reflection.class_name.humanize) if not link 
       end
     else
       value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
