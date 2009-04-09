@@ -38,11 +38,13 @@ module Esda::Scaffolding::ScaffoldHelper
       elsif value.class == TrueClass
         'Ja'
       else
-        if entry.column_for_attribute(column).type == :text
-	  content_tag("div", value, :class=>"pre")
-	else
-          value
-	end
+        silence_warnings do
+          if entry.column_for_attribute(column).type == :text
+            content_tag("div", value, :class=>"pre")
+          else
+            value
+          end
+        end
       end
     end
   end
