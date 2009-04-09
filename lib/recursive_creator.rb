@@ -1,6 +1,6 @@
 module RecursiveCreator
   # creates instance and creates new belongs_to associated objects if necessary
-  def recursively_create(model_class, params_part)
+  def recursively_create(model_class, params_part, clone_from=nil)
     # create associations first
     associations = model_class.reflect_on_all_associations.find_all{|a| a.macro==:belongs_to}
     created_objects = {}
@@ -16,6 +16,13 @@ module RecursiveCreator
       found = Hash[*found.flatten]
     else 
       found = nil
+    end
+    if clone_from
+      if found
+        found = clone_from.attributes.merge(found)
+      else
+        found = clone_from.attributes
+      end
     end
     instance = model_class.new(found)
     instance.valid?
