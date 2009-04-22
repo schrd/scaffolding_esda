@@ -188,6 +188,17 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         else
           inlinenew = ""
         end
+        if (model.scaffold_column_options(field.to_s)['edit_assoc'] == true rescue false) and not record.send(assoc.primary_key_name).nil?
+          editlink = link_to(image_tag('edit.png'), 
+                             {:action=>'edit', 
+                              :controller=>assoc.klass.name.underscore, 
+                              :id=>record.send(assoc.primary_key_name),
+                              :redirect_to=>url_for()}, 
+                             :title=>"Ausgewählte #{assoc.klass.scaffold_model_name} bearbeiten", 
+                             :class=>'button')
+        else
+          editlink = ""
+        end
         if count < 100 and (model.scaffold_column_options(field.to_s)['custom_renderer'] != :hidden_inline_browser rescue true)
           return content_tag('div', 
             association_select_tag(record, assoc, conditions, condition_params, name_prefix, css_class) + 
@@ -198,7 +209,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
                   :controller=>assoc.klass.name.underscore, 
                   :action=>'show' 
                 )
-              ) + inlinenew,
+              ) + inlinenew + editlink,
               :class=>'association'
             )
         end
@@ -214,7 +225,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
               :url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'browse_data'),
               :header_url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'headerspec'),
               :selected_text=>(record.send(assoc.name).scaffold_name rescue '&nbsp;&nbsp;&nbsp;')
-            ) + inlinenew,
+            ) + inlinenew + editlink,
             :class=>'association'
           )
       end
