@@ -90,7 +90,8 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         fields.map{|f|
           field_element = nil
           if fixed_fields.include?(f) or (record.respond_to?("#{f}_immutable?") and record.send("#{f}_immutable?"))
-            field_element = scaffold_value(record, f)
+            colname = model.column_name_by_attribute(f)
+            field_element = scaffold_value(record, f).to_s + hidden_field_tag(html_name(model, colname, name_prefix), record.send(colname))
           else
             field_element = scaffold_field(record, f, name_prefix)
           end
@@ -172,7 +173,14 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           rescue
           end
         end
-        count = assoc.klass.count(:conditions=>[conditions.join(" AND "), *condition_params])
+        count = 0
+        if assoc.options[:conditions]
+          assoc.klass.with_scope(:find=>{:conditions=>assoc.options[:conditions]}) do
+            count = assoc.klass.count(:conditions=>[conditions.join(" AND "), *condition_params])
+          end
+        else
+          count = assoc.klass.count(:conditions=>[conditions.join(" AND "), *condition_params])
+        end
         if User.current_user and User.current_user.has_any_privilege?(["#{assoc.klass.name}::CREATE", "#{assoc.klass.name}::ALL", "Application::ALL"])
           inlinenew = content_tag('span', '', 
                                          :class=>'inlinenew', 
@@ -213,6 +221,11 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
               :class=>'association'
             )
         end
+        if assoc.options[:conditions].is_a?(Hash)
+          extra_params = assoc.options[:conditions].map{|k,v| "search[#{assoc.klass.name.underscore}][#{k}]=#{URI.encode(v.to_s, /[^a-zA-Z0-9.,]/)}"}.join("&")
+        else
+          extra_params = nil
+        end
         return content_tag('div',
             content_tag('span', 
               hidden_field_tag(
@@ -224,6 +237,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
               :title=>"#{assoc.klass.scaffold_model_name} auswählen",
               :url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'browse_data'),
               :header_url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'headerspec'),
+              :extra_params=>extra_params,
               :selected_text=>(record.send(assoc.name).scaffold_name rescue '&nbsp;&nbsp;&nbsp;')
             ) + inlinenew + editlink,
             :class=>'association'
@@ -270,14 +284,26 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
   # entries are ordered by +scaffold_select_order+ of the associated model
   def association_select_tag(record, assoc, conditions, condition_params, name_prefix, css_class)
     model = record.class
-    select_tag(html_name(model, assoc.primary_key_name, name_prefix), 
-      options_for_select([["", ""]] + 
-        assoc.klass.find(:all, 
+    data = nil
+    if assoc.options[:conditions]
+      assoc.klass.with_scope(:find=>{:conditions=>assoc.options[:conditions]}) do
+        data = assoc.klass.find(:all, 
+            :conditions=>[conditions.join(" AND "), *condition_params], 
+            :order=>assoc.klass.scaffold_select_order
+          ).map{|row| 
+            [row.scaffold_name, row.id]
+          } 
+      end
+    else
+      data = assoc.klass.find(:all, 
           :conditions=>[conditions.join(" AND "), *condition_params], 
           :order=>assoc.klass.scaffold_select_order
         ).map{|row| 
           [row.scaffold_name, row.id]
-        }, 
+        } 
+    end
+    select_tag(html_name(model, assoc.primary_key_name, name_prefix), 
+      options_for_select([["", ""]] + data,
         record.send(assoc.primary_key_name)
       ),
       :class=>css_class,
