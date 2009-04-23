@@ -25,10 +25,15 @@ module Esda::Scaffolding::Helper::TableIndexedPositionHelper
         posision_index_association = possible_associations.first
       end
     end
-    index_model.find(:all, :order=>options[:index_order]).map{|index_instance|
+    index_model.find(:all, :order=>options[:index_order], :conditions=>options[:index_conditions]).map{|index_instance|
       tbl, empty = indexed_table(position_model, instance, instance.class.primary_key , index_instance, posision_index_association, position_reverse_assoc) 
       new_pos = ""
-      new_pos = indexed_new(instance, index_instance, position_model, posision_index_association, position_reverse_assoc) if empty or index_instance.send(multiple)
+      multi = if multiple.is_a?(Symbol)
+                index_instance.send(multiple)
+              else
+                multiple
+              end
+      new_pos = indexed_new(instance, index_instance, position_model, posision_index_association, position_reverse_assoc) if empty or multi
       content_tag("h2", h(index_instance.scaffold_name)) +
       content_tag('div',
         tbl + new_pos,
@@ -79,7 +84,7 @@ module Esda::Scaffolding::Helper::TableIndexedPositionHelper
                              )
                      ) +
           fields.map{|f|
-            content_tag('td', h(inst.send(f)))
+            content_tag('td', scaffold_value(inst, f))
           }.join("")          
         )
       }.join("\n"),
@@ -93,7 +98,7 @@ module Esda::Scaffolding::Helper::TableIndexedPositionHelper
     link_to(image_tag("filenew.png"), 
             {
                   :action=>'new', :controller=>position_model.name.underscore,
-                  "invisible_fields"=>[posision_index_association.name, position_reverse_assoc.name],
+                  "fixed_fields"=>[posision_index_association.name, position_reverse_assoc.name],
                   "#{position_model.name.underscore}[#{posision_index_association.primary_key_name}]"=>index_instance.id,
                   "#{position_model.name.underscore}[#{position_reverse_assoc.primary_key_name}]"=>instance.id,
                     :redirect_to=>url_for()
