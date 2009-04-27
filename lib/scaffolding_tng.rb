@@ -122,10 +122,18 @@ class ActionController::Base
       set_legacy_vars
     end
     layout = request.xhr? ? false : 'esda'
-    if template_exists?("#{self.class.controller_path}/#{action}")
-      render(options.merge({:action=>action, :layout=>layout}))
+    if Rails::VERSION::MAJOR == 1
+      if template_exists?("#{self.class.controller_path}/#{action}")
+        render(options.merge({:action=>action, :layout=>layout}))
+      else
+        render(options.merge({:file=>File.dirname(__FILE__) + "/../scaffolds_tng/#{action}.rhtml", :layout=>layout}))
+      end
     else
-      render(options.merge({:file=>File.dirname(__FILE__) + "/../scaffolds_tng/#{action}.rhtml", :layout=>layout}))
+      begin
+        render(options.merge({:action=>action, :layout=>layout}))
+      rescue ActionView::MissingTemplate
+        render(options.merge({:file=>File.dirname(__FILE__) + "/../scaffolds_tng/#{action}.rhtml", :layout=>layout}))
+      end
     end
   end
   @@scaffold_template_dir = "#{File.dirname(__FILE__)}/../scaffolds_tng"

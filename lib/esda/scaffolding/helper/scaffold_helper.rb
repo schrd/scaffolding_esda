@@ -53,7 +53,7 @@ module Esda::Scaffolding::ScaffoldHelper
     links = link_to(image_tag('filefind.png'), url_for(:action=>'show') + "/\#{#{model_class.primary_key}}", :title=>'Anzeigen') +
             link_to(image_tag('edit.png'), url_for(:action=>'edit') + "/\#{#{model_class.primary_key}}", :title=>'Bearbeiten') +
             link_to(image_tag('editcopy.png'), url_for(:action=>'new') + "?clone_from=\#{#{model_class.primary_key}}", :title=>'Kopieren') +
-            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + "/\#{#{model_class.primary_key}}", :title=>'Löschen') +
+            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + "/\#{#{model_class.primary_key}}", :title=>'Löschen', :onclick=>"return(confirm('\#{scaffold_name} wirklich löschen?'))") +
             has_many_links(model_class)
  		([['Verknüpfungen', '<a class="button" onclick="findLiveGridAround(this).grid.search();">Suchen</a>', nil, nil, links]] +
 		model_class.scaffold_browse_fields.map{|f|
@@ -67,7 +67,7 @@ module Esda::Scaffolding::ScaffoldHelper
   def has_many_links(model_class)
     associations = model_class.reflect_on_all_associations.find_all{|a| a.macro==:has_many}.sort_by{|a| a.name.to_s}
     content_tag('div',
-      '<img src="/images/2downarrow.png">' +
+      image_tag('2downarrow.png') +
       content_tag('div',
         content_tag('div', 
           content_tag('div',
