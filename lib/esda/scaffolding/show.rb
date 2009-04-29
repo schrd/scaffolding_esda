@@ -7,6 +7,12 @@ module Esda::Scaffolding::Show
       }.sort_by{|a| 
         a.name.to_s.humanize
       }
+      if model_class.respond_to?(:inline_association)
+        @inline_association = model_class.inline_association
+        @tab_associations -= [@inline_association]
+      else
+        @inline_association = nil
+      end
       if request.xhr?
         render_scaffold_tng "show_inline"
       else
