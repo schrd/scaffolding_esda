@@ -58,6 +58,7 @@ module Esda::Scaffolding::Helper::TableIndexedPositionHelper
       fields = model.scaffold_indexed_table_fields
     else
       fields = model.scaffold_browse_fields
+      fields -= [index_assoc.name.to_s, position_reverse_assoc.name.to_s]
     end
     headinst = model.new
 
