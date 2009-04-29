@@ -11,7 +11,6 @@ module Esda::Scaffolding::Browse
       hash = params[:search][@model.name.underscore.to_sym].dup.delete_if{|k,v| 
         not @model.scaffold_no_browse_columns.include?(k.to_s)
       }
-      logger.debug("extra hash: #{hash.inspect}")
 
       @extra_params = hash.map{|k,v| "search[#{@model.name.underscore}][#{k}]=#{URI.encode(v, /[^a-zA-Z0-9.,]/)}"}.join("&")
     end
@@ -36,7 +35,7 @@ module Esda::Scaffolding::Browse
     @count = model.count(:conditions=>[conditions.join(" AND "), *condition_params], :include=>model.browse_include_fields2[0])
     @link = false
     @link = true if params.has_key?(:link)
-    if not params[:sort].blank? and params[:sort] =~ /(.+) (DESC|ASC)$/
+    if (not params[:sort].blank?) and params[:sort] =~ /(.+) (DESC|ASC)$/
       field = $1
       sort = $2
       if not model.scaffold_browse_fields.include?(field)
@@ -50,7 +49,7 @@ module Esda::Scaffolding::Browse
           table = jd.joins[dep].aliased_table_name
           model_class2 = jd.joins[join_deps[ field.split('.')[0..-2].join('.') ]].reflection.klass
           field = model_class2.column_name_by_attribute(field.split('.').last)
-          ok = false unless model.column_names.include?(field)
+          ok = false unless model_class2.column_names.include?(field)
         else
           table = model.table_name
           field = model.column_name_by_attribute(field)
