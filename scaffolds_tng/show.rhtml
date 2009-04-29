@@ -13,6 +13,18 @@
     <%= link_to (image_tag("edit.png") + " #{h(@instance.class.scaffold_model_name)} bearbeiten", :action=>'edit', :id=>@instance.id) %>
     <br/>
     <%= link_to (image_tag("editcopy.png") + " #{h(@instance.class.scaffold_model_name)} kopieren", :action=>'new', :clone_from=>@instance.id) %>
+    <% if @inline_association %>
+      <div class="inlineassoc">
+      <% assoc = @inline_association %>
+      <h2><%= h(assoc.klass.scaffold_model_plural_name) %></h2>
+      <%= content_tag('div', '',
+        :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.primary_key_name}]=#{@instance.id}",
+        :header_url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"headerspec"),
+        :url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"browse_data"),
+        :class=>'livegrid'
+      ) %>
+      </div>
+    <% end %>
   </div>
   <% @tab_associations.each do |assoc| %>
   <div id="tabcontent_<%= assoc.name %>">
