@@ -91,7 +91,13 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           field_element = nil
           if fixed_fields.include?(f) or (record.respond_to?("#{f}_immutable?") and record.send("#{f}_immutable?"))
             colname = model.column_name_by_attribute(f)
-            field_element = scaffold_value(record, f).to_s + hidden_field_tag(html_name(model, colname, name_prefix), record.send(colname))
+            val = record.send(colname)
+            if val.class==TrueClass
+              val = 't'
+            elsif val.class == FalseClass
+              val = 'f'
+            end
+            field_element = scaffold_value(record, f).to_s + hidden_field_tag(html_name(model, colname, name_prefix), val)
           else
             field_element = scaffold_field(record, f, name_prefix)
           end
