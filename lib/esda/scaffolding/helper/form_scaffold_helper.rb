@@ -114,7 +114,13 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         :class=>"record-form"
       ) + invisible_fields.map{|inv_f|
         colname = model.column_name_by_attribute(inv_f)
-        hidden_field_tag(html_name(model, colname, name_prefix), record.send(colname))
+        val = record.send(colname)
+        if val.class==TrueClass
+          val = 't'
+        elsif val.class == FalseClass
+          val = 'f'
+        end
+        hidden_field_tag(html_name(model, colname, name_prefix), val)
       }.join() + invisible_fields.map{|inv_f| hidden_field_tag('invisible_fields[]', inv_f)}.join()
     ) 
   end
