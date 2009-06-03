@@ -19,7 +19,7 @@
     <br/>
     <%= link_to(image_tag("filenew.png") + " #{h(@instance.class.scaffold_model_name)} neu erzeugen", :action=>'new') %>
     <br/>
-    <%= link_to (image_tag("editcopy.png") + " #{h(@instance.class.scaffold_model_name)} kopieren", :action=>'new', :clone_from=>@instance.id) %>
+    <%= link_to(image_tag("editcopy.png") + " #{h(@instance.class.scaffold_model_name)} kopieren", :action=>'new', :clone_from=>@instance.id) %>
     <% if @inline_association %>
       <div class="inlineassoc">
       <% assoc = @inline_association %>
