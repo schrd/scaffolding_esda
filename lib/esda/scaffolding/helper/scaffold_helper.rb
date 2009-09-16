@@ -12,7 +12,7 @@ module Esda::Scaffolding::ScaffoldHelper
       column_options = entry.class.scaffold_column_options(column.to_s) || {}
       if column_options['render'] == :inline
         if (entry.send(column.to_s))
-          render_component(:controller=>reflection.class_name.underscore.to_s, :action=>'showinline', :params=>{:column_name=>column.to_s, :idid =>(entry.send(column.to_s).id rescue nil)})
+          record_show(entry.send(column.to_s))
         end
       else
         id = entry.send(reflection.primary_key_name)

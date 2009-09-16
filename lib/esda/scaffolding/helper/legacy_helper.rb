@@ -55,22 +55,7 @@ module ActionView
             #logger.debug("input2(#{record_name}/#{method.to_s}): " + record.scaffold_column_types.inspect)
             #logger.debug("input3: " + method.to_s + ' ' + record.scaffold_column_types[method.to_s].inspect) # geht nicht
             column_options = record.class.scaffold_column_options(method.to_s) || {}
-            if column_options['render'] == :inline
-              component = render_component(:controller=>reflection.class_name.downcase.to_s, :action=>'newinline', :params=>{:parent_record_name=>record_name, :column_name=>method.to_s, :idid =>(record.send(method.to_s).id rescue nil)})
-              #logger.debug("component raw: " + component)
-              search  = "(for|id)=\"#{reflection.class_name.to_s.downcase}_"
-              replace = "\\1=\"#{record_name.to_s}_#{method.to_s}_"
-              component.gsub!(Regexp.new(search), replace)
-              #logger.debug("component id: " + component)
-              search  = "name=\"#{reflection.class_name.to_s.downcase}\\["
-              replace = "name=\"#{record_name.to_s}[#{method.to_s}]["
-              component.gsub!(Regexp.new(search), replace)
-              search  = "prepareselect\\('#{reflection.class_name.to_s.downcase}_"
-              replace = "prepareselect('#{record_name.to_s}_#{method.to_s}_"
-              component.gsub!(Regexp.new(search), replace)
-              #logger.debug("component name: " + component)
-              component
-            elsif column_options['render'] == :custom
+            if column_options['render'] == :custom
               self.send(column_options['custom_renderer'], record, *(column_options['custom_renderer_args']))
             else
               #logger.debug("#{record_name.methods.sort.inspect} \n :::\n #{record_name.to_s.methods.sort.inspect}\n:::\n#{method.inspect}")
