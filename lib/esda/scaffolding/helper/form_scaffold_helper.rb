@@ -27,7 +27,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
             user_text << User.find(record.updated_by).login
           end
         end
-        if record.respond_to?(:updated_at)
+        if record.respond_to?(:updated_at) and not record.updated_at.nil?
           user_text << record.updated_at.strftime("%d.%m.%Y %H:%M:%S")
         end
         if user_text.length == 0
@@ -38,7 +38,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
               user_text << User.find(record.created_by).login
             end
           end
-          if record.respond_to?(:created_at)
+          if record.respond_to?(:created_at) and not record.created_at.nil?
             user_text << record.created_at.strftime("%d.%m.%Y %H:%M:%S")
           end
         end
@@ -164,6 +164,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     else
       begin
       model = record.class
+      logger.debug("model: #{model}")
       assoc = model.reflect_on_association(field.to_sym)
       colname = model.column_name_by_attribute(field)
       column = model.columns_hash[colname.to_s]
@@ -187,7 +188,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         end
         count = 0
         if assoc.options[:conditions]
-          assoc.klass.with_scope(:find=>{:conditions=>assoc.options[:conditions]}) do
+          assoc.klass.send(:with_scope, :find=>{:conditions=>assoc.options[:conditions]}) do
             count = assoc.klass.count(:conditions=>[conditions.join(" AND "), *condition_params])
           end
         else
@@ -278,7 +279,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         #check_box_tag(html_name(model, field, name_prefix), "t", record.send(field + "?"), :class=>css_class)
       end
       rescue Exception=>e
-        h(e.to_s) + field.to_s
+        h(e.to_s) + " Feld " + field.to_s
       end
     end
   end
@@ -298,7 +299,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     model = record.class
     data = nil
     if assoc.options[:conditions]
-      assoc.klass.with_scope(:find=>{:conditions=>assoc.options[:conditions]}) do
+      assoc.klass.send(:with_scope, :find=>{:conditions=>assoc.options[:conditions]}) do
         data = assoc.klass.find(:all, 
             :conditions=>[conditions.join(" AND "), *condition_params], 
             :order=>assoc.klass.scaffold_select_order

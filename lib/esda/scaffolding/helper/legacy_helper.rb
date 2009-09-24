@@ -34,39 +34,8 @@ module ActionView
     module ActiveRecordHelper
       def input(record_name, method, options = {})
         record = assigns[record_name.to_s]
+        record = self.instance_variable_get("@#{record_name.to_s}") if record.nil?
         return scaffold_field(record, method)
-        #logger.debug(assigns.inspect)
-        #logger.debug("input 0: " + record.inspect)
-        sql_type = (record.class.columns_hash[method.to_s].sql_type rescue nil)
-        if sql_type
-          cssclass = sql_type.gsub(/numeric\(([0-9]+),([0-9]+)\)/, 'numeric\1D\2')
-          #logger.debug("cssclass: " + cssclass)
-          options = {:class=>cssclass}.merge(options)
-        end
-        null = (record.class.columns_hash[method.to_s].null rescue true)
-        if !null
-          options[:class] = options[:class].to_s + ' notnull'
-        end
-        #logger.debug("css class: " + options[:class].to_s)
-        reflection = record.class.reflect_on_association(method.to_sym)
-        if reflection 
-          if reflection.macro == :belongs_to
-            #logger.debug("input: " + reflection.inspect)
-            #logger.debug("input2(#{record_name}/#{method.to_s}): " + record.scaffold_column_types.inspect)
-            #logger.debug("input3: " + method.to_s + ' ' + record.scaffold_column_types[method.to_s].inspect) # geht nicht
-            column_options = record.class.scaffold_column_options(method.to_s) || {}
-            if column_options['render'] == :custom
-              self.send(column_options['custom_renderer'], record, *(column_options['custom_renderer_args']))
-            else
-              #logger.debug("#{record_name.methods.sort.inspect} \n :::\n #{record_name.to_s.methods.sort.inspect}\n:::\n#{method.inspect}")
-              association_select_tag(record_name.to_s, method.to_sym, (options[:class].to_s =~ /notnull/), options)
-            end
-          else
-            InstanceTag.new(record_name, method, self).to_tag(options)
-          end
-        else
-          InstanceTag.new(record_name, method, self).to_tag(options)
-        end
       end
 
       # Uses a table to display the form widgets, so that everything lines up

@@ -65,7 +65,7 @@ module Esda::Scaffolding::ScaffoldHelper
 		}).to_json
   end
   def has_many_links(model_class)
-    associations = model_class.reflect_on_all_associations.find_all{|a| a.macro==:has_many}.sort_by{|a| a.name.to_s}
+    associations = model_class.reflect_on_all_associations.find_all{|a| a.macro==:has_many and not a.options.has_key?(:through)}.sort_by{|a| a.name.to_s}
     content_tag('div',
       image_tag('2downarrow.png') +
       content_tag('div',
