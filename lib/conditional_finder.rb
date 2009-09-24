@@ -36,8 +36,8 @@ module ConditionalFinder
       case column.type
       when :string, :text
         if not params_part[param_name].blank?
-          conditions << "#{table}.#{field} ILIKE ?"
-          condition_params << params_part[param_name] + '%'          
+          conditions << "UPPER(#{table}.#{field}) LIKE UPPER(?)"
+          condition_params << params_part[param_name] + '%'
         end
       when :boolean
         if not params_part[param_name].blank?
