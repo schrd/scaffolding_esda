@@ -155,6 +155,17 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
   end
   # scaffolds an input field dependent on the column type
   def scaffold_field(record, field, name_prefix=nil)
+    if record.respond_to?("#{field}_immutable?") and record.send("#{field}_immutable?")
+      model = record.class
+      colname = model.column_name_by_attribute(field)
+      val = record.send(colname)
+      if val.class==TrueClass
+        val = 't'
+      elsif val.class == FalseClass
+        val = 'f'
+      end
+      return (scaffold_value(record, field).to_s + hidden_field_tag(html_name(model, colname, name_prefix), val))
+    end
     if field.to_s =~ /\./
       assoc, rest = field.to_s.split('.', 2)
       return record.send(assoc, rest, name_prefix)
