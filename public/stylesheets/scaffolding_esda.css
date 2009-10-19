@@ -1,0 +1,179 @@
+.record-show, .record-form {
+/*	
+ 	-moz-border-radius: 3px 3px 3px 3px;
+	border: #cccccc solid 1px;
+	*/
+}
+.record-show th, .record-form th {
+	max-width: 300px;
+	border: 1px solid #cccccc; 
+	/*background: #e6e6e6 url(/images/jquery-ui/images/ui-bg_glass_80_e6e6e6_1x400.png) 50% 50% repeat-x;*/
+	background: #e6e6e6;
+	color: #444444;
+	-moz-border-radius: 3px 3px 3px 3px;
+	text-align: right;
+	padding-right: 5px;
+}
+
+input[type=submit], input[type=reset] {
+	border: outset 1px;
+	/*background-color: #C3D7F2;*/
+	background: #99c2ff url(/images/jquery-ui/images/ui-bg_glass_50_99c2ff_1x400.png) 50% 50% repeat-x;
+	-moz-border-radius: 3px 3px 3px 3px;
+	border: 1px solid #aaaaaa;
+}
+a.button, button {
+	/*border: outset 1px;*/
+	border: 1px solid #aaaaaa;
+	/*background-color: #C3D7F2;*/
+	margin: 1px;
+	padding: 1px 7px 1px 7px;
+	text-decoration: none;
+	color: black;
+	cursor: default;
+	/*background: #99c2ff url(/images/jquery-ui/images/ui-bg_glass_50_99c2ff_1x400.png) 50% 50% repeat-x;*/
+	background: #99c2ff;
+	-moz-border-radius: 3px 3px 3px 3px;
+}
+a.button:hover, button:hover, input[type=submit]:hover, input[type=reset]:hover {
+	border: 1px solid #2694e8;
+	color:white;
+}
+a.button img {
+	vertical-align:bottom;
+	margin-bottom: 2px;
+}
+
+a img {
+	border: none;
+}
+
+td.hasmanyassociations {
+	z-index:0;
+}
+div.hasmanyassociations {
+	position:relative;
+	background: #ccc;
+	z-index:1;
+	width: 16px;
+	display:inline;
+}
+div.hasmanyassociations img {
+	z-index:1;
+}
+div.hasmanyassociations div.associationslist {
+	position:absolute;
+	left: 10px;
+	top: -20px;
+	visibility: hidden;
+	z-index:2;
+	width:auto;
+}
+tr.bottom div.hasmanyassociations div.associationslist {
+	left: 10px;
+	top: auto !important;
+	bottom: 0px;
+}
+div.hasmanyassociations:hover div.associationslist {
+	visibility:visible;
+	z-index:2;
+}
+div.hasmanyassociations div.associationslist>br {
+	height: 10px;
+}
+div.hasmanyassociations div.associationslist>div {
+	margin-top: 15px;
+	margin-left: 5px;
+	padding: 4px;
+	border: solid black thin;
+	background-color: #ccc;
+	-moz-border-radius: 0px 8px 8px 8px;
+}
+tr.bottom div.hasmanyassociations div.associationslist>div {
+	-moz-border-radius: 8px 8px 8px 0px;
+}
+div.hasmanyassociations:hover div.associationslist a {
+	display:block;
+}
+
+.livegrid {
+  border: solid #ccc 1px;
+  margin: 5px;
+  //overflow: hidden;
+	background-color: #fff;
+	color: black;
+}
+.livegridcounter {
+	background-color: #fff;
+	color: black;
+}
+.scrolltable tr.head td {
+  background-color: #fff;
+  font-weight: bold;
+}
+.scrolltable tr.resizable td {
+  background: url(/images/resize2.gif) repeat-y right;
+}
+.scrolltable tr.head td>div, .scrolltable tr.head td>div:hover {
+  position:static;
+  visibility:visible;
+  overflow:hidden;
+}
+.scrolltable tr.head td>div select, .scrolltable tr.head td>div:hover select {
+  overflow:visible;
+}
+
+.scrolltable td, .scrolltable th {
+  z-index:0;
+  border: solid 1px #ccc;
+  text-align: left;
+}
+.scrolltable td.clipped {
+  z-index:0;
+  border: solid 1px #ccc;
+  text-align: left;
+  background: url(/images/ecke_rechts_unten.png) right bottom no-repeat;
+}
+.scrolltable td.ASC>div {
+	background: url(/images/1uparrow.png) right center no-repeat;
+}
+.scrolltable td.DESC>div {
+	background: url(/images/1downarrow.png) right center no-repeat;
+}
+.scrolltable td>div, .scrolltable th>div {
+  overflow: hidden;
+  color: black;
+  z-index:0;
+  position:relative;
+  margin: 1px;
+}
+.scrolltable td>div:hover {
+  overflow:visible;
+  z-index:1;
+}
+.scrolltable {
+  z-index:0;
+  background-color: white;
+  max-width: 100%;
+}
+.scrolltable td>div div.cellcontent {
+  position:absolute;
+  overflow: hidden;
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+}
+.scrolltable td>div:hover div.cellcontent {
+  position:absolute;
+  overflow: visible;
+  border: #666 solid thin;
+  background-color: #ddd;
+  z-index: 3;
+  left:-3px;
+  top: -3px;
+  padding: 2px;
+  min-width: 100%;
+}
+.scrollable {
+  z-index: 4;
+}
