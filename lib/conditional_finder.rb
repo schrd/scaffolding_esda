@@ -58,20 +58,28 @@ module ConditionalFinder
         if column.type == :float or column.type == :decimal
           regex = /^-?\d+([.,]\d+)?$/
         end
+        cast_method = case column.type
+                      when :integer
+                        :to_i
+                      when :float
+                        :to_f
+                      when :decimal
+                        :to_d
+                      end
         if (params_part[param_name][:from].to_s =~ regex rescue false)
           conditions << "#{table}.#{field} >= ?"
-          condition_params << params_part[param_name][:from].to_s.gsub(/,/, ".")
+          condition_params << params_part[param_name][:from].to_s.gsub(/,/, ".").send(cast_method)
         end
         if (params_part[param_name][:to].to_s =~ regex rescue false)
           conditions << "#{table}.#{field} <= ?"
-          condition_params << params_part[param_name][:to].to_s.gsub(/,/, ".")
+          condition_params << params_part[param_name][:to].to_s.gsub(/,/, ".").send(cast_method)
         end
         if (params_part[param_name].is_a?(Array) and params_part[param_name].size > 1)
           conditions << "#{table}.#{field} IN (?)"
-          condition_params << params_part[param_name].map{|e| e.to_s.gsub(/,/, ".")}
+          condition_params << params_part[param_name].map{|e| e.to_s.gsub(/,/, ".").send(cast_method)}
         elsif (params_part[param_name].to_s =~ regex rescue false)
           conditions << "#{table}.#{field} = ?"
-          condition_params << params_part[param_name].to_s.gsub(/,/, ".")
+          condition_params << params_part[param_name].to_s.gsub(/,/, ".").send(cast_method)
         end
       end # case
     }
