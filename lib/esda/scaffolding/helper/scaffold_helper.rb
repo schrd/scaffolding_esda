@@ -50,6 +50,7 @@ module Esda::Scaffolding::ScaffoldHelper
     end
   end
   def header_fields_for(model_class)
+    return self.send("#{model_class.name.underscore}_header_fields".to_sym, model_class) if respond_to?("#{model_class.name.underscore}_header_fields".to_sym)
     links = link_to(image_tag('filefind.png'), url_for(:action=>'show') + "/\#{#{model_class.primary_key}}", :title=>'Anzeigen') +
             link_to(image_tag('edit.png'), url_for(:action=>'edit') + "/\#{#{model_class.primary_key}}", :title=>'Bearbeiten') +
             link_to(image_tag('editcopy.png'), url_for(:action=>'new') + "?clone_from=\#{#{model_class.primary_key}}", :title=>'Kopieren') +
