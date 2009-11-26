@@ -1,0 +1,4 @@
+There are some issues with this plugin that can quite easily be fixed:
+* use i18n for templates
+* make livegrid compatible with other browsers than Firefox
+
