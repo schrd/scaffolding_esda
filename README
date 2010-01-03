@@ -17,4 +17,11 @@ developed it for our inhouse ERP system.
      scaffold :my_very_own_model
    end
 
-* run the 
+* copy the assets from the public/ directory to your app or use you own
+* implement a model named User that implements a has_any_privilege? method:
+
+    class User < ActiveRecord::Base
+      def has_any_privilege?(privs)
+        true
+      end
+    end
