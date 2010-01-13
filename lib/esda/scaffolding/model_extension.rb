@@ -3,6 +3,44 @@ module Esda::Scaffolding::Model
     base.extend(ClassMethods)
   end
 
+  def to_fixture(filter_assocs_on=nil)
+    relevant_habtm_associations = self.class.fixture_relevant_habtm_associations
+    "#{fixture_name}:\n" +
+      self.class.columns.find_all{|col|
+        not col.primary
+      }.map{|col|
+        assoc = self.class.reflect_on_all_associations.find{|assoc| assoc.macro==:belongs_to and assoc.primary_key_name==col.name.to_s}
+        if assoc
+          val = self.send(assoc.name)
+          val = val.fixture_name if val
+          colname = assoc.name
+        else
+          colname = col.name
+          val = self.attributes[col.name.to_s]
+          #val = '""' if val == ""
+          if val.is_a?(String)
+            #val = "|-\n    " + val.split(/\r?\n/).join("\n    ") + "\n"
+            val = val.to_yaml[4..-2].gsub(/\n/, "\n    ")
+          end
+        end
+        "  #{colname}: #{val}"
+    }.join("\n") + "\n" +
+    relevant_habtm_associations.map{|assoc|
+      restricted_assoc_instances = nil
+      restricted_assoc_instances = filter_assocs_on.find_all{|inst| inst.class == assoc.klass} unless filter_assocs_on.nil?
+      if restricted_assoc_instances
+        assoc.klass.send(:with_scope, :find=>{:conditions=>["#{assoc.table_name}.#{assoc.klass.primary_key} IN (?)", restricted_assoc_instances.map{|inst| inst.id}]}) do
+          "  #{assoc.name}: #{self.send(assoc.name).map{|inst| inst.fixture_name}.join(', ')}"
+        end
+      else
+        "  #{assoc.name}: #{self.send(assoc.name).map{|inst| inst.fixture_name}.join(', ')}"
+      end
+    }.join("\n") + "\n"  
+  end
+  def fixture_name
+    id
+  end
+
   # all methods of this module are added to ActiveRecord::Base
   module ClassMethods
     attr_accessor :scaffold_select_order
@@ -114,6 +152,13 @@ module Esda::Scaffolding::Model
         @scaffold_table_classes ||= {:form=>'formtable', :list=>'sortable', :show=>'sortable'}
         @scaffold_table_classes[type]
       end
+    def fixture_relevant_habtm_associations
+      self.reflect_on_all_associations.find_all{|assoc| 
+        assoc.macro==:has_and_belongs_to_many
+      }.find_all{|assoc| 
+        assoc.klass.name < self.class.name
+      }
+    end
   end
 end
 ActiveRecord::Base.send(:include, Esda::Scaffolding::Model)
