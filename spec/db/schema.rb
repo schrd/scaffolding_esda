@@ -19,6 +19,6 @@ ActiveRecord::Schema.define(:version => 0) do
   create_table :order_positions, :force=>true do |t|
     t.references :order, :null=>false
     t.string :sku
-    t.decimal :amount
+    t.decimal :quantity
   end
 end
