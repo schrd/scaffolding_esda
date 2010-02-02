@@ -1,0 +1,3 @@
+sqlite3:
+  :adapter: sqlite3
+  :database: vendor/plugins/scaffolding_esda/spec/db/scaffolding_esda.sqlite3.db
