@@ -4,6 +4,7 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/packagetask'
 require 'rake/gempackagetask'
+require 'spec/rake/spectask'
 PKG_NAME="scaffolding_esda"
 PKG_VERSION="0.9"
 dist_dirs = [ "tools", "lib", "rails", "scaffolds_tng", "test", "public" ]
@@ -43,4 +44,10 @@ namespace :scaffolding_esda do
   task :install_assets do
     puts RAILS_ROOT
   end
+end
+
+desc 'Run the specs'
+Spec::Rake::SpecTask.new(:spec) do |t|
+  t.spec_opts = ['--colour --format progress --loadby mtime --reverse']
+  t.spec_files = FileList['spec/**/*_spec.rb']
 end
