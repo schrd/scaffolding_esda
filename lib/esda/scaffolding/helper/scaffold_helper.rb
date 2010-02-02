@@ -1,5 +1,26 @@
 module Esda::Scaffolding::ScaffoldHelper
   # Returns associated object's scaffold_name if column is an association, otherwise returns column value.
+  # If column is a dotted name it descends this path using belongs_to associations. Example:
+  #
+  # class Order < ActiveRecord::Base
+  #   belongs_to :customer
+  #   has_many :order_positions
+  # end
+  # class OrderPosition < ActiveRecord::Base
+  #   belongs_to :order
+  # end
+  #
+  # It will display the customer_number field from customer if called like this:
+  # scaffold_value(@order_position_instance, "order.customer.customer_number")
+  #
+  # Customization hooks:
+  # For columns of type :binary
+  #   #{column}_is_image? 
+  #     * if true it will render an image tag. Image is linked to download action
+  #     * if false (default) it will render a download link
+  # For belongs_to associations
+  #   see scaffold_column_options model class method
+  # 
   #
   def scaffold_value(entry, column, link=true, cache=nil)
     return "" if entry.nil?
@@ -42,6 +63,12 @@ module Esda::Scaffolding::ScaffoldHelper
         silence_warnings do
           if entry.column_for_attribute(column).type == :text
             content_tag("div", value, :class=>"pre")
+          elsif entry.column_for_attribute(column).type == :binary
+            if entry.respond_to?("#{column}_is_image?".to_sym)
+              image_tag(url_for(:action=>'download_column', :id=>entry.id, :column=>column))
+            else
+              link_to("Herunterladen", :action=>'download_column', :id=>entry.id, :column=>column)
+            end
           else
             value
           end
