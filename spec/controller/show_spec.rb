@@ -26,4 +26,14 @@ describe "module Esda::Scaffolding::Show", "download action" do
     response.content_type.should == "application/octet-stream"
     response.body.should == data
   end
+  it "should send binary data with a custom mime type" do
+    customer = mock_model(Customer)
+    data = "This would be the binary photo"
+    customer.should_receive(:photo).and_return(data)
+    customer.should_receive(:mime_type_for_photo).and_return("image/jpeg")
+    Customer.should_receive(:find).with("123").and_return(customer)
+    get :download_column, :id=>123, :column=>'photo'
+    response.content_type.should == "image/jpeg"
+    response.body.should == data
+  end
 end
