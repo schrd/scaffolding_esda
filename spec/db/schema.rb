@@ -10,6 +10,7 @@ ActiveRecord::Schema.define(:version => 0) do
     t.string :city
     t.string :country
     t.string :zip_code
+    t.binary :photo
   end
   create_table :orders, :force=>true do |t|
     t.integer :order_number
