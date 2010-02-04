@@ -25,7 +25,7 @@ describe "module Esda::Scaffolding::Browse", "browse action" do
   end
 end
 
-describe "module Esda::Scaffolding::Browse", "browse action" do
+describe "module Esda::Scaffolding::Browse", "browse_data action" do
   controller_name :order
   before(:each) do
     @order = mock_model(Order)
