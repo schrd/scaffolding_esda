@@ -28,7 +28,7 @@ module Esda::Scaffolding::Edit
         render_scaffold_tng "edit"
       end
     rescue ActiveRecord::RecordNotFound
-      render :inline=>"Datensatz mit ID <%=h(params[:id])%> nicht gefunden", :status=>404
+      render :inline=>"Datensatz mit ID <%= params[:id].to_i %> nicht gefunden", :status=>404
     end
   end
   def update
@@ -71,7 +71,7 @@ module Esda::Scaffolding::Edit
       end
       render_scaffold_tng "edit", :status=>status
     rescue ActiveRecord::RecordNotFound
-      render :inline=>"Datensatz mit ID #{h(params[:id])} nicht gefunden", :status=>404
+      render :inline=>"Datensatz mit ID #{params[:id].to_i} nicht gefunden", :status=>404
     end
   end
   def list_association
