@@ -86,6 +86,13 @@ module Esda::Scaffolding::Model
         assoc.macro==:belongs_to
       }.map{|a| a.name}
     end
+    # This method is needed for determining table name aliases by ActiveRecord Join Dependencies
+    # it looks though the scaffold_browse fields and generates an include parameter for 
+    # ActiveRecord::Base.find
+    #
+    # It also generates an index hash for ActiveRecords JoinDependency logic.
+    # The Joindependency is needed for generating the correct table name for
+    # the conditions parameter. It is used by the ConditionalFinder module
     def browse_include_fields2
       includes = []
       join_deps = [self.name.to_sym]
