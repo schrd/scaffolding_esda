@@ -94,4 +94,32 @@ describe Esda::Scaffolding::Model::ClassMethods do
       Customer.scaffold_fields.should == %w(customer_number)
     end
   end
+
+  context "scaffold_browse_fields" do
+    it "should return scaffold_fields if nothing else configured" do
+      Customer.should_receive(:scaffold_fields).and_return(%w(a b))
+      Customer.scaffold_browse_fields.should == %w(a b)
+    end
+
+    it "should return the contents of @scaffold_browse_fields if set" do
+      Customer.instance_variable_set("@scaffold_browse_fields", %w(a b c))
+      Customer.scaffold_browse_fields.should == %w(a b c)
+    end
+  end
+
+  context "scaffold_no_browse_fields" do
+    it "should return scaffold_fields without scaffold_browse_fields" do
+      Customer.should_receive(:scaffold_fields).and_return(%w(a b c))
+      Customer.should_receive(:scaffold_browse_fields).and_return(%w(a))
+      Customer.scaffold_no_browse_fields.should == %w(b c)
+    end
+  end
+
+  context "scaffold_fields=" do
+    it "should store scaffold_fields" do
+      testcolumns = %w(field_a field_b field_c)
+      Customer.scaffold_fields = testcolumns
+      Customer.scaffold_fields.should == testcolumns
+    end
+  end
 end
