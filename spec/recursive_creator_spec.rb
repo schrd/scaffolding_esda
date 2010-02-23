@@ -1,8 +1,8 @@
 require "spec_helper"
 require "common_models"
 
-describe RecursiveCreator do
-  include RecursiveCreator
+describe Esda::Scaffolding::Controller::RecursiveCreator do
+  include Esda::Scaffolding::Controller::RecursiveCreator
 
   it "should create simple instances" do
     params = {:city=>"xyz"}
