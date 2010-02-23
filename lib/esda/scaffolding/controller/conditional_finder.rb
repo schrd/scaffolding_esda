@@ -1,4 +1,4 @@
-module ConditionalFinder
+module Esda::Scaffolding::Controller::ConditionalFinder
   # returns two arrays:
   # * <tt>conditions</tt> is a arry that has to be joined by " AND "
   # * <tt>condition_params</tt> is a list of values that have to be interpolated into the conditions.

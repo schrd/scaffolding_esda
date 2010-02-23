@@ -1,1 +1,10 @@
+require 'esda/scaffolding/model_extension'
+require 'esda/scaffolding/helper/scaffold_helper'
+require 'esda/scaffolding/helper/legacy_helper'
+require 'esda/scaffolding/helper/table_indexed_position_helper'
+require 'esda/scaffolding/controller/browse.rb'
+require 'esda/scaffolding/controller/edit.rb'
+require 'esda/scaffolding/controller/new.rb'
+require 'esda/scaffolding/controller/show.rb'
+require 'esda/scaffolding/controller/destroy.rb'
 require "esda/scaffolding/controller/scaffold"

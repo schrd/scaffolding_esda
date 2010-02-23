@@ -1,5 +1,5 @@
 # defines edit/update actions
-module Esda::Scaffolding::Edit
+module Esda::Scaffolding::Controller::Edit
   def edit
     begin
       @instance = model_class.find(params[:id])
