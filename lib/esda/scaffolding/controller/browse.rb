@@ -1,6 +1,6 @@
 # defines methods which are made available in a scaffolded controller
-module Esda::Scaffolding::Browse
-  include ConditionalFinder
+module Esda::Scaffolding::Controller::Browse
+  include Esda::Scaffolding::Controller::ConditionalFinder
   def index
     browse
   end

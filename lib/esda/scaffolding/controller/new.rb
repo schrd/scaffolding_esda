@@ -1,5 +1,5 @@
 # defines scaffold methods for creating new instances
-module Esda::Scaffolding::New
+module Esda::Scaffolding::Controller::New
   def new
     p = params
     if not params[:name_prefix].blank?

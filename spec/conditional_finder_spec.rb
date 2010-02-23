@@ -1,7 +1,10 @@
 require "spec_helper"
 require "common_models"
-describe ConditionalFinder do
-  include ConditionalFinder
+describe Esda::Scaffolding::Controller::ConditionalFinder do
+  include Esda::Scaffolding::Controller::ConditionalFinder
+  before(:each) do
+    Customer.instance_variable_set("@scaffold_browse_fields", nil)
+  end
   it "should search case insensitive on string columns with a left-bould like search" do
     conditions, condition_params = build_conditions(Customer, {:country=>'de'})
     conditions.should == ["1=1", "UPPER(customers.country) LIKE UPPER(?)"]

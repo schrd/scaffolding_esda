@@ -1,6 +1,6 @@
 module Esda::Scaffolding::Helper::FormScaffoldHelper
   include Esda::Scaffolding::ScaffoldHelper
-  include ConditionalFinder
+  include Esda::Scaffolding::Controller::ConditionalFinder
 
   # scaffold a record instance for show
   # valid options are:

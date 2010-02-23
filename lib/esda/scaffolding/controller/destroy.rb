@@ -1,4 +1,4 @@
-module Esda::Scaffolding::Destroy
+module Esda::Scaffolding::Controller::Destroy
   def destroy
     begin
       @instance = model_class.find(params[:id])

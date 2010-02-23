@@ -1,4 +1,4 @@
-module Esda::Scaffolding::Show
+module Esda::Scaffolding::Controller::Show
   def show
     begin
       @instance = model_class.find(params[:id])

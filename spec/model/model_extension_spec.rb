@@ -20,6 +20,10 @@ def mock_association(macro, name, klass, options={})
 end
 
 describe Esda::Scaffolding::Model::ClassMethods do
+  after(:each) do 
+    Customer.instance_variable_set("@scaffold_browse_fields", nil)
+    Customer.scaffold_fields = nil
+  end
   context "column_name_by_attribute method" do
     it "should return the attribute name as column if it is not an association" do
       Customer.should_receive(:reflect_on_association).with(:customer_number).and_return(nil)

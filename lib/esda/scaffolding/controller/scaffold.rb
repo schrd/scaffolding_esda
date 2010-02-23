@@ -79,25 +79,25 @@ module Esda::Scaffolding::Controller
         end
       end_eval
       if add_methods.include?(:browse)
-          include Esda::Scaffolding::Browse
+        include Esda::Scaffolding::Controller::Browse
       end
       if add_methods.include?(:new)
-          include Esda::Scaffolding::New
+        include Esda::Scaffolding::Controller::New
       end
       if add_methods.include?(:edit)
-          include Esda::Scaffolding::Edit
+        include Esda::Scaffolding::Controller::Edit
       end
       if add_methods.include?(:show)
-          include Esda::Scaffolding::Show
+        include Esda::Scaffolding::Controller::Show
       end
       if add_methods.include?(:destroy)
-        include Esda::Scaffolding::Destroy
+        include Esda::Scaffolding::Controller::Destroy
       end
       if options[:habtm]
         if options[:habtm].is_a?(Symbol)
           options[:habtm] = [options[:habtm]]
         end
-        include Esda::Scaffolding::Browse
+        include Esda::Scaffolding::Controller::Browse
         klass = class_name.constantize
         options[:habtm].each {|assoc_sym|
           assoc = klass.reflect_on_association(assoc_sym)
