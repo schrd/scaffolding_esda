@@ -1,4 +1,5 @@
 module Esda::Scaffolding::Controller::RecursiveCreator
+  protected
   # creates instance and creates new belongs_to associated objects if necessary
   def recursively_create(model_class, params_part, clone_from=nil)
     # create associations first
