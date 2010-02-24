@@ -1,5 +1,6 @@
 module Esda::Scaffolding::Controller
   module Scaffold
+    protected
     def render_scaffold_tng(action, options={})
       @scaffold_singular_name = model_class.name
       @scaffold_plural_name = model_class.name.pluralize
@@ -42,8 +43,8 @@ module Esda::Scaffolding::Controller
     def scaffold(model_id, options={})
       scaffold_tng(model_id, options)
       module_eval <<-"end_eval"
-        include Esda::Scaffolding::Helper::LegacyHelper
         helper :"Esda::Scaffolding::Helper::Legacy"
+        protected
         def set_legacy_vars
           @#{model_id.to_s.underscore.singularize} = @instance
           @scaffold_class = model_class
@@ -68,9 +69,9 @@ module Esda::Scaffolding::Controller
       include Esda::Scaffolding::Controller::Scaffold
 
       module_eval <<-"end_eval", __FILE__, __LINE__
-        include Esda::Scaffolding::Helper::FormScaffoldHelper
         helper :"Esda::Scaffolding::Helper::FormScaffold"
         include Esda::Scaffolding::Controller::RecursiveCreator
+        protected
         def model_class
           #{class_name}
         end
