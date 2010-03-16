@@ -31,8 +31,8 @@ spec = Gem::Specification.new do |s|
 
   s.author = "Daniel Schreiber"
   s.email = "schreiber@esda.com"
-  #s.homepage = "http://www.rubyonrails.org"
-  #s.rubyforge_project = "scaffolding_esda"
+  s.homepage = "http://gitorious.org/scaffolding_esda"
+  s.rubyforge_project = "scaffolding_esda"
 end
 Rake::GemPackageTask.new(spec) do |p|
   p.gem_spec = spec
