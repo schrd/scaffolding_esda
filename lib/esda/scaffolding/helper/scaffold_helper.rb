@@ -119,23 +119,10 @@ module Esda::Scaffolding::ScaffoldHelper
     )
   end
   def scaffold_field_name(record, column)
-    begin
-      if record.is_a?(ActiveRecord::Base)
-      column_options = record.class.scaffold_column_options(column.to_s)
-      else
-        column_options = record.scaffold_column_options(column.to_s)
-      end
-    rescue
-      column_options = {}
-    end
-    if column_options.nil?
-      column_options = {}
-    end
-
-    if column_options['title']
-      column_options['title']
+    if record.is_a?(ActiveRecord::Base)
+      return record.class.scaffold_field_name(column)
     else
-      column.to_s.humanize
+      return record.scaffold_field_name(column)
     end
   end
 
