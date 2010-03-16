@@ -104,6 +104,23 @@ module Esda::Scaffolding::Model
       }
       return includes, index
     end
+
+    def scaffold_field_name(column)
+      begin
+        column_options = self.scaffold_column_options(column.to_s)
+      rescue
+        column_options = {}
+      end
+      if column_options.nil?
+        column_options = {}
+      end
+
+      if column_options['title']
+        column_options['title']
+      else
+        column.to_s.humanize
+      end
+    end
     private
     def hierarchize_fields!(includes, join_dependency_order, elements, all_elements, index)
       hash = includes.find{|e| e.keys.include?(elements[0])}
