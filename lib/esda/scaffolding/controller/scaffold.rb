@@ -70,6 +70,7 @@ module Esda::Scaffolding::Controller
 
       module_eval <<-"end_eval", __FILE__, __LINE__
         helper :"Esda::Scaffolding::Helper::FormScaffold"
+        helper :"Esda::Scaffolding::Helper::Scaffold"
         include Esda::Scaffolding::Controller::RecursiveCreator
         protected
         def model_class
