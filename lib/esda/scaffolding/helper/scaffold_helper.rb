@@ -1,4 +1,4 @@
-module Esda::Scaffolding::ScaffoldHelper
+module Esda::Scaffolding::Helper::ScaffoldHelper
   # Returns associated object's scaffold_name if column is an association, otherwise returns column value.
   # If column is a dotted name it descends this path using belongs_to associations. Example:
   #
