@@ -43,4 +43,23 @@ describe "module Esda::Scaffolding::Browse", "browse_data action" do
     response.content_type.should == "application/json"
   end
 
+  it "should use localized date parameters (de)" do
+    I18n.locale = "de"
+    d = Date.new(2010,3,2)
+    Order.should_receive(:scaffold_browse_fields).at_least(:once).and_return(%w(order_numer customer.customer_number deliver_until))
+    Order.should_receive(:find).with(:all, :limit=>50, :conditions=>["1=1 AND orders.deliver_until >= ?", d], :order=>nil, :include=>[{:customer=>[]}], :offset=>0)
+    get :browse_data, {:limit=>50, :search=>{:order=>{"deliver_until"=>{"from"=>"02.03.2010"}}}}
+    response.content_type.should == "application/json"
+  end
+  it "should use localized date parameters (en)" do
+    I18n.locale = :en
+    I18n.default_locale = :en
+    d = Date.new(2010,3,2)
+    I18n.t(:"date.formats.default").should == "%Y-%m-%d"
+    Order.should_receive(:scaffold_browse_fields).at_least(:once).and_return(%w(order_numer customer.customer_number deliver_until))
+    Order.should_receive(:find).with(:all, :limit=>50, :conditions=>["1=1 AND orders.deliver_until >= ?", d], :order=>nil, :include=>[{:customer=>[]}], :offset=>0)
+    get :browse_data, {:limit=>50, :search=>{:order=>{"deliver_until"=>{"from"=>"2010-03-02"}}}}
+    response.content_type.should == "application/json"
+  end
+
 end
