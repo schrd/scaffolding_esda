@@ -46,13 +46,24 @@ module Esda::Scaffolding::Controller::ConditionalFinder
           condition_params << params_part[param_name]
         end
       when :date
-        if params_part[param_name][:from].to_s =~ /^\d{1,2}\.\d{1,2}\.\d{4}$/
-          conditions << "#{table}.#{field} >= ?"
-          condition_params << Date.strptime(params_part[param_name][:from], "%d.%m.%Y")
+        format = I18n.t(:"date.formats.default", :default=>"")
+        begin
+        if format.blank?
+          regexp = /^\d{1,2}\.\d{1,2}\.\d{4}$/ if regexp.nil?
+        else
+          regexp = Regexp.new("^#{Delocalize::LocalizedDateTimeParser.apply_regex(format)}$")
         end
-        if params_part[param_name][:to].to_s =~ /^\d{1,2}\.\d{1,2}\.\d{4}$/
+        rescue NameError
+          regexp = /^\d{1,2}\.\d{1,2}\.\d{4}$/ if regexp.nil?
+        end
+
+        if params_part[param_name][:from].to_s =~ regexp
+          conditions << "#{table}.#{field} >= ?"
+          condition_params << Date.strptime(params_part[param_name][:from], format)
+        end
+        if params_part[param_name][:to].to_s =~ regexp
           conditions << "#{table}.#{field} <= ?"
-          condition_params << Date.strptime(params_part[param_name][:to], "%d.%m.%Y")
+          condition_params << Date.strptime(params_part[param_name][:to], format)
         end
       when :integer, :float, :decimal
         regex = /^-?\d+$/
