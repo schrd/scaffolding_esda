@@ -70,4 +70,38 @@ describe Esda::Scaffolding::Helper::ScaffoldHelper, :type=>:helper do
       ret.should =~ /^<a href="[^"]*\/download_column\/#{cust.id}\?column=photo">Herunterladen<\/a>$/
     end
   end
+  context "header_fields_for" do
+    it "should call customized helper" do
+      helper2 = helper.clone
+      helper2.should_receive(:customer_header_fields).and_return("foo")
+      ret=helper2.header_fields_for(Customer)
+      ret.should == "foo"
+    end
+    it "should include all scaffold_browse_fields" do
+      get :dummy
+      ret = helper.header_fields_for(Customer)
+      Customer.scaffold_browse_fields.should_not be_empty 
+      Customer.scaffold_browse_fields.each{|f|
+        ret.should =~ /\#\{#{f}\}/
+      }
+    end
+    it "should return json" do
+      get :dummy
+      ret = helper.header_fields_for(Customer)
+      parsed=JSON.parse(ret)
+      parsed.class.should == Array
+    end
+  end
+  context "scaffold_field_name" do
+    before(:each) do
+      @name = "Name field"
+      Customer.should_receive(:scaffold_field_name).with(:name).and_return(@name)
+    end
+    it "should work for models" do
+      helper.scaffold_field_name(Customer, :name).should == @name
+    end
+    it "should work for instances" do
+      helper.scaffold_field_name(Customer.new, :name).should == @name
+    end
+  end
 end
