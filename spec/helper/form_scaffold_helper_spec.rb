@@ -1,6 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__),'..','spec_helper.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__),'..','common_controllers.rb'))
-describe Esda::Scaffolding::Helper::FormScaffoldHelper do
+require File.expand_path(File.join(File.dirname(__FILE__),'..','common_models.rb'))
+describe Esda::Scaffolding::Helper::FormScaffoldHelper, :type=>:helper do
   context "show_record" do
     before(:each) do
       @customer = Customer.new(:customer_number=>1234, :name=>"foobar")

@@ -5,6 +5,15 @@ rescue LoadError=>e
   exit
 end
 
+begin
+  require 'spork'
+  Spork.prefork do
+  end
+  Spork.each_run do
+  end
+rescue LoadError=>ignored
+end
+
  
 plugin_spec_dir = File.dirname(__FILE__)
 ActiveRecord::Base.logger = Logger.new(plugin_spec_dir + "/debug.log")
