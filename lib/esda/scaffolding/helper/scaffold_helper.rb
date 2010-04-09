@@ -62,15 +62,15 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       else
         silence_warnings do
           if entry.column_for_attribute(column).type == :text
-            content_tag("div", value, :class=>"pre")
+            content_tag("div", h(value), :class=>"pre")
           elsif entry.column_for_attribute(column).type == :binary
-            if entry.respond_to?("#{column}_is_image?".to_sym)
+            if entry.respond_to?("#{column}_is_image?".to_sym) and entry.send("#{column}_is_image?".to_sym)
               image_tag(url_for(:action=>'download_column', :id=>entry.id, :column=>column))
             else
               link_to("Herunterladen", :action=>'download_column', :id=>entry.id, :column=>column)
             end
           else
-            value
+            h(value)
           end
         end
       end
@@ -78,10 +78,10 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   end
   def header_fields_for(model_class)
     return self.send("#{model_class.name.underscore}_header_fields".to_sym, model_class) if respond_to?("#{model_class.name.underscore}_header_fields".to_sym)
-    links = link_to(image_tag('filefind.png'), url_for(:action=>'show') + "/\#{#{model_class.primary_key}}", :title=>'Anzeigen') +
-            link_to(image_tag('edit.png'), url_for(:action=>'edit') + "/\#{#{model_class.primary_key}}", :title=>'Bearbeiten') +
-            link_to(image_tag('editcopy.png'), url_for(:action=>'new') + "?clone_from=\#{#{model_class.primary_key}}", :title=>'Kopieren') +
-            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + "/\#{#{model_class.primary_key}}", :title=>'Löschen', :onclick=>"return(confirm('\#{scaffold_name} wirklich löschen?'))") +
+    links = link_to(image_tag('filefind.png'), url_for(:action=>'show', :id=>"\#{#{model_class.primary_key}}"), :title=>'Anzeigen') +
+            link_to(image_tag('edit.png'), url_for(:action=>'edit', :id=>"/\#{#{model_class.primary_key}}"), :title=>'Bearbeiten') +
+            link_to(image_tag('editcopy.png'), url_for(:action=>'new', "clone_from"=>"\#{#{model_class.primary_key}}"), :title=>'Kopieren') +
+            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy', :id=>"/\#{#{model_class.primary_key}}"), :title=>'Löschen', :onclick=>"return(confirm('\#{scaffold_name} wirklich löschen?'))") +
             has_many_links(model_class)
  		([['Verknüpfungen', '<a class="button" onclick="findLiveGridAround(this).grid.search();">Suchen</a>', nil, nil, links]] +
 		model_class.scaffold_browse_fields.map{|f|
@@ -104,10 +104,10 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
                 assoc.options[:foreign_key] :
                 assoc.primary_key_name)
               content_tag('div',
-                link_to(assoc.name.to_s.capitalize, 
+                link_to(h(assoc.name.to_s.capitalize), 
                   url_for(:controller=>assoc.class_name.underscore, 
-                    :action=>'browse') +  
-                    "?search[#{assoc.class_name.underscore}][#{foreignkeyfield}]=\#{#{model_class.primary_key}}"
+                    :action=>'browse'
+                  ) + "?search[#{assoc.class_name.underscore}][#{foreignkeyfield}]=\#{#{model_class.primary_key}}"
                 )
               )
             }.join("\n")
@@ -120,9 +120,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   end
   def scaffold_field_name(record, column)
     if record.is_a?(ActiveRecord::Base)
-      return record.class.scaffold_field_name(column)
+      return h(record.class.scaffold_field_name(column))
     else
-      return record.scaffold_field_name(column)
+      return h(record.scaffold_field_name(column))
     end
   end
 
