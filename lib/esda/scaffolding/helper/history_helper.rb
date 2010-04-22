@@ -20,14 +20,17 @@ module Esda::Scaffolding::Helper::HistoryHelper
       }
 
       log_id_field = model.table_name + '_log_id'
+      middle_id = (records[records.size/2].send(log_id_field) rescue nil)
 
       content_tag('div',
         content_tag('table',
           content_tag('tr',
             content_tag('th', '') +
             records.map{|rec|
-              nav_after = ((rec.object_id == records.first.object_id ? link_to("&larr;", :action=>'history', :id=>rec.id, :after=>rec.try(log_id_field)) + "&nbsp;" : "") rescue "")
-              nav_before = ((rec.object_id == records.last.object_id ? "&nbsp;" + link_to("&rarr;", :action=>'history', :id=>rec.id, :before=>rec.try(log_id_field)) : "") rescue "")
+              nav_after = ((rec.object_id == records.first.object_id and rec.attributes.has_key?(log_id_field)) ? 
+                           link_to("&larr;", :action=>'history', :id=>rec.id, :after=>middle_id) + "&nbsp;" : "")
+              nav_before = (rec.object_id == records.last.object_id ? 
+                           "&nbsp;" + link_to("&rarr;", :action=>'history', :id=>rec.id, :before=>middle_id) : "")
               ts_text = rec.respond_to?(:date_on) ?
                   h("#{scaffold_value(rec, :date_on)} - #{scaffold_value(rec, :date_off)}") :
                   scaffold_value(rec, :updated_at)
