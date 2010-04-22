@@ -25,6 +25,8 @@
       ) %>
       </div>
     <% end %>
+    <br/>
+    <%= link_to(h("Veränderungen anzeigen"), :action=>'history', :id=>@instance.id) %>
   </div>
   <% @tab_associations.each do |assoc| %>
   <div id="tabcontent_<%= assoc.name %>">

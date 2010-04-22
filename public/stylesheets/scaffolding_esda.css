@@ -15,6 +15,13 @@
 	padding-right: 5px;
 }
 
+.record-show td.changed {
+  border-top: solid red 1px;
+  border-bottom: solid red 1px;
+  background-color: #FFECD7;
+}
+
+
 input[type=submit], input[type=reset] {
 	border: outset 1px;
 	/*background-color: #C3D7F2;*/

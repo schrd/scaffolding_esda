@@ -41,6 +41,17 @@ module Esda::Scaffolding::Model
     id
   end
 
+  def differing_fields(comp)
+    raise ArgumentError unless comp.class == self.class
+    self.class.scaffold_fields.find_all{|f|
+      begin
+        self.send(f) != comp.send(f)
+      rescue ActiveRecord::MissingAttributeError
+        false
+      end
+    }
+  end
+
   # all methods of this module are added to ActiveRecord::Base
   module ClassMethods
     attr_accessor :scaffold_select_order

@@ -74,3 +74,55 @@ describe "module Esda::Scaffolding::Show", "download action" do
     end
   end
 end
+describe "module Esda::Scaffolding::Show", "history action" do
+  controller_name :customer
+  before(:each) do
+  end
+  context "real data processing" do
+    before(:each) do
+      Customer.primary_key = "customer_id"
+      @cust = Customer.new
+      # override id
+      @cust.should_receive(:id).any_number_of_times.and_return(123)
+      Customer.should_receive(:find).with("123").and_return(@cust)
+
+    end
+    it "should load most recent data" do
+      Customer.primary_key = "customer_id"
+      cust1 = Customer.new
+      cust2 = Customer.new
+      Customer.should_receive(:find_by_sql).with(["SELECT * FROM customers_log WHERE customer_id=? ORDER BY customers_log_id DESC LIMIT 2", "123"]).and_return([cust1, cust2])
+      get :history, :id=>123
+      response.should render_template("history")
+      assigns[:instances].should == [@cust, cust1, cust2]
+    end
+
+    it "should load data before id x" do
+      cust1 = Customer.new
+      cust2 = Customer.new
+      cust3 = Customer.new
+      Customer.should_receive(:find_by_sql).with(["SELECT * FROM customers_log WHERE customer_id=? and customers_log_id < ? ORDER BY customers_log_id DESC LIMIT 3", "123", "2345"]).and_return([cust1, cust2, cust3])
+      get :history, :id=>123, :before=>2345
+      response.should render_template("history")
+      assigns[:instances].should == [cust1, cust2, cust3]
+    end
+
+    it "should load data after id x" do
+      cust1 = Customer.new
+      cust2 = Customer.new
+      cust3 = Customer.new
+      Customer.should_receive(:find_by_sql).with(["SELECT * FROM customers_log WHERE customer_id=? and customers_log_id > ? ORDER BY customers_log_id DESC LIMIT 3", "123", "2345"]).and_return([cust1, cust2, cust3])
+      get :history, :id=>123, :after=>2345
+      response.should render_template("history")
+      assigns[:instances].should == [cust1, cust2, cust3]
+    end
+    it "should display log data and current data if not enough log records exist" do
+      cust1 = Customer.new
+      cust2 = Customer.new
+      Customer.should_receive(:find_by_sql).with(["SELECT * FROM customers_log WHERE customer_id=? and customers_log_id > ? ORDER BY customers_log_id DESC LIMIT 3", "123", "2345"]).and_return([cust1, cust2])
+      get :history, :id=>123, :after=>2345
+      response.should render_template("history")
+      assigns[:instances].should == [@cust, cust1, cust2]
+    end
+  end
+end
