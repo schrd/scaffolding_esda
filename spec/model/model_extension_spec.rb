@@ -127,3 +127,23 @@ describe Esda::Scaffolding::Model::ClassMethods do
     end
   end
 end
+describe Esda::Scaffolding::Model do
+  context "differing_fields" do
+    it "should reject different classes" do
+      c = Customer.new
+      lambda {
+        c.differing_fields(Order.new)
+      }.should raise_error(ArgumentError)
+    end
+    it "should not return equal columns" do
+      c1 = Customer.new(:name=>"Foobar, Inc.", :city=>"acme")
+      c1.differing_fields(c1).should == []
+    end
+    it "should return unequal columns" do
+      c1 = Customer.new(:name=>"Foobar, Inc.", :city=>"acme")
+      c2 = Customer.new(:name=>"Foobar, Inc.", :city=>"acme st.")
+      c1.differing_fields(c2).should == %w(city)
+      c2.differing_fields(c1).should == %w(city)
+    end
+  end
+end

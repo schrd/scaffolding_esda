@@ -63,4 +63,25 @@ module Esda::Scaffolding::Controller::Show
     end
 
   end
+
+  def history
+    @model_class = model_class
+    @instances = [model_class.find(params[:id])]
+    if not params[:before].blank?
+      sql = "SELECT * FROM #{model_class.table_name}_log WHERE #{model_class.primary_key}=? and #{model_class.table_name}_log_id < ? ORDER BY #{model_class.table_name}_log_id DESC LIMIT 3"
+      @instances = model_class.find_by_sql([sql, params[:id], params[:before]])
+    elsif not params[:after].blank?
+      sql = "SELECT * FROM #{model_class.table_name}_log WHERE #{model_class.primary_key}=? and #{model_class.table_name}_log_id > ? ORDER BY #{model_class.table_name}_log_id DESC LIMIT 3"
+      instances = model_class.find_by_sql([sql, params[:id], params[:after]])
+      if instances.size < 3
+        @instances.concat(instances)
+      else
+        @instances = instances
+      end
+    else
+      sql = "SELECT * FROM #{model_class.table_name}_log WHERE #{model_class.primary_key}=? ORDER BY #{model_class.table_name}_log_id DESC LIMIT 2"
+      @instances.concat(model_class.find_by_sql([sql, params[:id]]))
+    end
+    render_scaffold_tng "history" 
+  end
 end
