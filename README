@@ -13,7 +13,7 @@ developed it for our inhouse ERP system.
 
 * use the scaffold method in your controller:
 
-   class MyVeryOwnController
+   class MyVeryOwnController < ApplicationController
      scaffold :my_very_own_model
    end
 
