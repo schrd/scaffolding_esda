@@ -86,7 +86,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     name_prefix = options[:name_prefix] # nil default
     model = record.class
     lock_field = ""
-    if model.locking_enabled?()
+    if model.locking_enabled?() and not record.new_record?
       lock_field = hidden_field_tag(html_name(model, model.locking_column, name_prefix), record.send(model.locking_column))
     end
     content_tag('div',
