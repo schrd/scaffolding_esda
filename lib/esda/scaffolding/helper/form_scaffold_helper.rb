@@ -85,6 +85,10 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
   def record_form_table(record, options, fields, fixed_fields, invisible_fields)
     name_prefix = options[:name_prefix] # nil default
     model = record.class
+    lock_field = ""
+    if model.locking_enabled?()
+      lock_field = hidden_field_tag(html_name(model, model.locking_column, name_prefix), record.send(model.locking_column))
+    end
     content_tag('div',
       content_tag('table',
         fields.map{|f|
@@ -121,7 +125,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           val = 'f'
         end
         hidden_field_tag(html_name(model, colname, name_prefix), val)
-      }.join() + invisible_fields.map{|inv_f| hidden_field_tag('invisible_fields[]', inv_f)}.join()
+      }.join() + invisible_fields.map{|inv_f| hidden_field_tag('invisible_fields[]', inv_f)}.join() + lock_field
     ) 
   end
   def record_form_quer_zeile(record, options={})
