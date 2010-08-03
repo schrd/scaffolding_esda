@@ -32,8 +32,16 @@ module Esda::Scaffolding::Controller::Edit
     end
   end
   def update
+    if not params.has_key?(params_name)
+      return edit
+    end
     begin
       @instance = model_class.find(params[:id])
+      if model_class.locking_enabled?() and 
+           params[params_name].has_key?(model_class.locking_column) and 
+           params[params_name][model_class.locking_column].to_i < @instance.lock_version.to_i
+        raise ActiveRecord::StaleObjectError, "Attempted to update a stale object"
+      end
       @tab_associations = model_class.reflect_on_all_associations.find_all{|a| 
         a.macro==:has_many and not a.options.has_key?(:through)
       }.sort_by{|a| 
@@ -72,6 +80,8 @@ module Esda::Scaffolding::Controller::Edit
       render_scaffold_tng "edit", :status=>status
     rescue ActiveRecord::RecordNotFound
       render :inline=>"Datensatz mit ID #{params[:id].to_i} nicht gefunden", :status=>404
+    rescue ActiveRecord::StaleObjectError
+      render :inline=>"Datensatz mit ID #{params[:id].to_i} nicht geändert. Daten wurden in der Zwischenzeit schon geändert", :status=>:conflict
     end
   end
   def list_association
