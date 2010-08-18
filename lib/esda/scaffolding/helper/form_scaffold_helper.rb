@@ -292,6 +292,8 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
                    :id=>html_id(model, field, name_prefix) 
                   )
         #check_box_tag(html_name(model, field, name_prefix), "t", record.send(field + "?"), :class=>css_class)
+      when :binary
+        file_field_tag(html_name(model, field, name_prefix))
       end
       rescue Exception=>e
         h(e.to_s) + " Feld " + field.to_s
