@@ -34,7 +34,7 @@
                 }
               }
               begin
-              daten.to_json
+              daten.to_json.html_safe
               rescue Exception=>e
                 logger.debug(e)
                 logger.debug(e.backtrace)

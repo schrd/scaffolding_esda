@@ -17,34 +17,34 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       fixed_fields = options[:fixed_fields] || []
       invisible_fields = options[:invisible_fields] || []
       fields -= invisible_fields
-      timestamps = ""
+      timestamps = h("")
       if options[:timestamps]
         user_text = []
         if record.respond_to?(:updated_by)
           if record.updated_by.is_a?(User)
-            user_text << record.updated_by.login
+            user_text << h(record.updated_by.login)
           elsif record.updated_by.is_a?(Numeric)
-            user_text << User.find(record.updated_by).login
+            user_text << h(User.find(record.updated_by).login)
           end
         end
         if record.respond_to?(:updated_at) and not record.updated_at.nil?
-          user_text << record.updated_at.strftime("%d.%m.%Y %H:%M:%S")
+          user_text << h(record.updated_at.strftime("%d.%m.%Y %H:%M:%S"))
         end
         if user_text.length == 0
           if record.respond_to?(:created_by)
             if record.created_by.is_a?(User)
-              user_text << record.created_by.login
+              user_text << h(record.created_by.login)
             elsif record.created_by.is_a?(Numeric)
-              user_text << User.find(record.created_by).login
+              user_text << h(User.find(record.created_by).login)
             end
           end
           if record.respond_to?(:created_at) and not record.created_at.nil?
-            user_text << record.created_at.strftime("%d.%m.%Y %H:%M:%S")
+            user_text << h(record.created_at.strftime("%d.%m.%Y %H:%M:%S"))
           end
         end
         timestamps << content_tag('tr', 
-            content_tag('th', 'Zuletzt geändert') +
-            content_tag('td', user_text.join(" "))
+            content_tag('th', h('Zuletzt geändert')) +
+            content_tag('td', user_text.join(" ").html_safe)
           )
       end
       content_tag('div',
@@ -55,7 +55,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
               content_tag('th', scaffold_field_name(record, f) + ":") +
               content_tag('td', field_element)
             )
-          }.join() + timestamps,
+          }.join().html_safe + timestamps,
           :class=>"record-show"
         ) 
       ) 
@@ -112,9 +112,9 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           content_tag('tr',
             content_tag('th', scaffold_field_name(record, f) + ":") +
             content_tag('td', field_element)+
-            content_tag('td', e, :class=>eclass)
+            content_tag('td', h(e), :class=>eclass)
           )
-        }.join(),
+        }.join().html_safe,
         :class=>"record-form"
       ) + invisible_fields.map{|inv_f|
         colname = model.column_name_by_attribute(inv_f)
@@ -125,7 +125,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           val = 'f'
         end
         hidden_field_tag(html_name(model, colname, name_prefix), val)
-      }.join() + invisible_fields.map{|inv_f| hidden_field_tag('invisible_fields[]', inv_f)}.join() + lock_field
+      }.join().html_safe + invisible_fields.map{|inv_f| hidden_field_tag('invisible_fields[]', inv_f)}.join().html_safe + lock_field
     ) 
   end
   def record_form_quer_zeile(record, options={})
