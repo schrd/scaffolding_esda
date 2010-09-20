@@ -51,7 +51,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
           value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
         end
         return link_to(h(value), :action=>'show', :controller=>reflection.class_name.underscore.to_s, :id=>id) if value and link
-        return h(value.to_s) + content_tag('span', '', :class=>'inlineshow', :url=>url_for(:action=>'show', :controller=>"/"+reflection.class_name.underscore.to_s, :id=>id), :title=>reflection.class_name.humanize) if not link 
+        return h(value.to_s) + content_tag('span', h(''), :class=>'inlineshow', :url=>url_for(:action=>'show', :controller=>"/"+reflection.class_name.underscore.to_s, :id=>id), :title=>reflection.class_name.humanize) if not link 
       end
     else
       value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
@@ -90,7 +90,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
         f, 
         (model_class.scaffold_column_options(f.to_s)['search']['width'] rescue nil),
         column_template(model_class, f)]
-		}).to_json
+		}).to_json.html_safe
   end
   def has_many_links(model_class)
     associations = model_class.reflect_on_all_associations.find_all{|a| a.macro==:has_many and not a.options.has_key?(:through)}.sort_by{|a| a.name.to_s}
