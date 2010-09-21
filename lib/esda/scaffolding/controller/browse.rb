@@ -72,9 +72,9 @@ module Esda::Scaffolding::Controller::Browse
     cache = {}
     @model = model
     t3 = Time.now
-    json = render_to_string(:file=>scaffold_path('browse_data'))
+    json = render_to_string(:file=>scaffold_path('browse_data'), :layout=>false)
     t4 = Time.now
-    render :json=>json
+    render :json=>json, :layout=>false
     t2 = Time.now
   end
   public
