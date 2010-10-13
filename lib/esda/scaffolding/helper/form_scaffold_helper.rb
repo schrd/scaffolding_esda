@@ -12,7 +12,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       return send("#{record.class.name.underscore}_record_show", record, options)
     else
       model = record.class
-      fields = record.class.scaffold_fields
+      fields = record.class.scaffold_show_fields
       name_prefix = options[:name_prefix] # nil default
       fixed_fields = options[:fixed_fields] || []
       invisible_fields = options[:invisible_fields] || []

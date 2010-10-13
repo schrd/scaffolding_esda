@@ -97,6 +97,11 @@ module Esda::Scaffolding::Model
         assoc.macro==:belongs_to
       }.map{|a| a.name}
     end
+
+    def scaffold_show_fields
+      return @scaffold_show_fields if @scaffold_show_fields
+      return scaffold_fields
+    end
     # This method is needed for determining table name aliases by ActiveRecord Join Dependencies
     # it looks though the scaffold_browse fields and generates an include parameter for 
     # ActiveRecord::Base.find
