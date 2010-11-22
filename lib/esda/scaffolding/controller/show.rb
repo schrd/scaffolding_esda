@@ -56,7 +56,11 @@ module Esda::Scaffolding::Controller::Show
       if @instance.respond_to?("mime_type_for_#{column}")
         mime_type = @instance.send("mime_type_for_#{column}")
       end
-      send_data(@instance.send(column), :type=>mime_type)
+      filename = nil
+      if @instance.respond_to?("filename_for_#{column}")
+        filename = instance.send("filename_for_#{column}")
+      end
+      send_data(@instance.send(column), :type=>mime_type, :filename=>filename)
 
     rescue ActiveRecord::RecordNotFound
       render :inline=>"Datensatz mit ID <%= params[:id].to_i %> nicht gefunden", :status=>404
