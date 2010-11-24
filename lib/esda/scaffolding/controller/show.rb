@@ -58,7 +58,7 @@ module Esda::Scaffolding::Controller::Show
       end
       filename = nil
       if @instance.respond_to?("filename_for_#{column}")
-        filename = instance.send("filename_for_#{column}")
+        filename = @instance.send("filename_for_#{column}")
       end
       send_data(@instance.send(column), :type=>mime_type, :filename=>filename)
 
