@@ -1,4 +1,5 @@
 <h1><%= h(@instance.class.scaffold_model_name) %> anzeigen</h1>
+<%= header_above_tabs(@instance) %>
 <div id="tabs">
   <ul>
     <li><a href="#eigenschaften">Eigenschaften</a></li>
@@ -34,6 +35,7 @@
   </div>
   <% end %>
 </div>
+<%= footer_below_tabs(@instance) %>
 <script>
 jQuery.noConflict();
 jQuery(document).ready(function($) {
