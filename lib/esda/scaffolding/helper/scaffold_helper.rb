@@ -302,14 +302,14 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   def header_above_tabs(instance)
     method_name = instance.class.name.underscore + "_header_above_tabs"
     if respond_to?(method_name.to_sym)
-      self.send(method_name.to_sym)
+      self.send(method_name.to_sym, instance)
     end
   end
 
   def footer_below_tabs(instance)
     method_name = instance.class.name.underscore + "_footer_below_tabs"
     if respond_to?(method_name.to_sym)
-      self.send(method_name.to_sym)
+      self.send(method_name.to_sym, instance)
     end
   end
 end
