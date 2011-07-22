@@ -7,7 +7,7 @@
     <% end %>
   </ul>
   <div id="eigenschaften">
-    <% form_tag(:action=>'update', :id=>@instance.id) do %>
+    <% form_tag({:action=>'update', :id=>@instance.id}, {:multipart => true}) do %>
       <%= record_form(@instance, @options) %>
       <% if params.has_key?(:redirect_to) %>
       <%= hidden_field_tag("redirect_to", params[:redirect_to]) %>
