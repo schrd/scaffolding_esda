@@ -15,6 +15,9 @@ module Esda::Scaffolding::Controller::RecursiveCreator
     if params_part
       found = params_part.find_all{|k,v| v.is_a?(String) || v.is_a?(Numeric)}
       found = Hash[*found.flatten]
+      params_part.find_all{|k,v| v.is_a?(File)||v.is_a?(Tempfile)}.each do |k,v|
+        found[k] = v.read
+      end
     else 
       found = nil
     end
