@@ -273,11 +273,15 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       end
       return case column.type
       when :string, :date
+        size = model.scaffold_column_options(field.to_s).try(:[], 'size')
+        size = 30 if size.nil?
         text_field_tag(html_name(model, field, name_prefix), record.send(field), :class=>css_class,
-                      :id=>html_id(model, field, name_prefix), :size=>30)
+                      :id=>html_id(model, field, name_prefix), :size=>size)
       when :integer, :decimal, :numeric, :float
+        size = model.scaffold_column_options(field.to_s).try(:[], 'size')
+        size = 30 if size.nil?
         text_field_tag(html_name(model, field, name_prefix), record.send(field).to_s.gsub(".", ","), :class=>css_class,
-                      :id=>html_id(model, field, name_prefix), :size=>30)
+                      :id=>html_id(model, field, name_prefix), :size=>size)
       when :text
         opt = model.scaffold_column_options(field.to_s)
         html_options = {:class=>css_class, :rows=>5, :cols=>80, :wrap=>'off'}
