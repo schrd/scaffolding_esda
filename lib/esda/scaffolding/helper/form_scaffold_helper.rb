@@ -43,7 +43,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           end
         end
         timestamps << content_tag('tr', 
-            content_tag('th', h('Zuletzt geändert')) +
+            content_tag('th', h(_('Last changed'))) +
             content_tag('td', user_text.join(" ").html_safe)
           )
       end
@@ -158,7 +158,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     ) 
   end
   # scaffolds an input field dependent on the column type
-  def scaffold_field(record, field, name_prefix=nil)
+  def scaffold_field(record, field, name_prefix=nil, options={})
     if record.respond_to?("#{field}_immutable?") and record.send("#{field}_immutable?")
       model = record.class
       colname = model.column_name_by_attribute(field)
@@ -209,7 +209,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         else
           count = assoc.klass.count(:conditions=>[conditions.join(" AND "), *condition_params])
         end
-        if User.current_user and User.current_user.has_any_privilege?(["#{assoc.klass.name}::CREATE", "#{assoc.klass.name}::ALL", "Application::ALL"])
+        if User.current_user and User.current_user.has_any_privilege?(["#{assoc.klass.name}::CREATE", "#{assoc.klass.name}::ALL", "Application::ALL"]) and options[:link_new] != false
           inlinenew = content_tag('span', '', 
                                          :class=>'inlinenew', 
                                          :url=>url_for( params.merge({
