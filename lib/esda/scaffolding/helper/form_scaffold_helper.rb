@@ -323,6 +323,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       assoc.klass.send(:with_scope, :find=>{:conditions=>assoc.options[:conditions]}) do
         data = assoc.klass.find(:all, 
             :conditions=>[conditions.join(" AND "), *condition_params], 
+            :include=>assoc.klass.scaffold_select_include,
             :order=>assoc.klass.scaffold_select_order
           ).map{|row| 
             [row.scaffold_name, row.id]
@@ -331,6 +332,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     else
       data = assoc.klass.find(:all, 
           :conditions=>[conditions.join(" AND "), *condition_params], 
+          :include=>assoc.klass.scaffold_select_include,
           :order=>assoc.klass.scaffold_select_order
         ).map{|row| 
           [row.scaffold_name, row.id]
