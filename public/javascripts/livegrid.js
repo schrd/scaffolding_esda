@@ -103,7 +103,7 @@ LiveGrid.prototype.buildTable = function() {
   };
   var scrollh2 = function(event) {
     // triggers scroll event handler on this.scrollable
-    grid.scrollable.scrollTop = grid.scrollable.scrollTop + (event.detail ) * grid.rowFullHeight();
+    grid.scrollable.scrollTop = grid.scrollable.scrollTop + (event.wheelDelta / -40) * grid.rowFullHeight();
     event.preventDefault();
     grid.storePosition();
   };
@@ -473,29 +473,16 @@ LiveGrid.prototype.update_buffer = function() {
           var g = grid;
           var ncols = grid.options.header.numberOfColumns();
           var regex = /\#\{(.+?)\}/g;
+          var compiled_templates = [];
+          for (var j=0; j < ncols; j++) {
+            var template_src = grid.options.header.fields[j][4];
+            compiled_templates[j] = Handlebars.compile(template_src);
+          }
+
           for(var i=0; i < data.objects.length; i++) {
             data.data[i] = [];
             for (var j=0; j < ncols; j++) {
-              var template = grid.options.header.fields[j][4];
-              if (template) {
-                var matches = template.match(regex);
-                if (matches) {
-                for (var k=0; k < matches.length; k++) {
-                  var item = matches[k].substring(2, matches[k].length - 1);
-                  var jv = data.objects[i][item];
-                  if (jv != null) {
-                    if (typeof(jv)=="string") {
-                      jv=jv.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;");
-                    }
-                    template = template.split(matches[k]).join(jv);
-                  } else {
-                    template = template.split(matches[k]).join("");
-                  }
-                }
-		}
-              } else {
-              }
-              data.data[i][j] = '&nbsp;<div class="cellcontent">' + template + '</div>';
+              data.data[i][j] = '&nbsp;<div class="cellcontent">' + compiled_templates[j](data.objects[i]) + '</div>';
             }
           }
           var replace = grid.getReplacementBufferIndexForOffset(data['offset']);

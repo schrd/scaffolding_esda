@@ -110,11 +110,12 @@ module Esda::Scaffolding::Model
     # It also generates an index hash for ActiveRecords JoinDependency logic.
     # The Joindependency is needed for generating the correct table name for
     # the conditions parameter. It is used by the ConditionalFinder module
-    def browse_include_fields2
+    def browse_include_fields2(fields = nil)
       includes = []
       join_deps = [self.name.to_sym]
       index = {}
-      elements = scaffold_browse_fields.find_all{|f| f.to_s =~ /\./}.map{|f| f.split('.')[0..-2].map{|f| f.to_sym}}
+      fields = scaffold_browse_fields if fields.nil?
+      elements = fields.find_all{|f| f.to_s =~ /\./}.map{|f| f.split('.')[0..-2].map{|f| f.to_sym}}
       @hierarchize_counter = 0
       elements.each{|e|
       hierarchize_fields!(includes, join_deps, e, e, index)
