@@ -284,7 +284,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     else
       assoc = mc.reflect_on_association(field.split(".").last.to_sym)
       if assoc
-        id_field = (assocs.size == 0 ? assoc.primary_key_name : (assocs +  ['id']).join("."))
+        id_field = field + ".id"
         link_to("{{#{field}.scaffold_name}}", url_for(:action=>'show', :controller=>assoc.klass.name.underscore)+ "/{{#{id_field}}}")
       else
         "{{#{field}}}"
