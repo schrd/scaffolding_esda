@@ -13,6 +13,11 @@ module Esda::Scaffolding::Controller::Show
       else
         @inline_association = nil
       end
+      if @instance.respond_to?(:extra_tab_links)
+        @extra_tab_links = @instance.extra_tab_links
+      else
+        @extra_tab_links = []
+      end
       if request.xhr?
         render_scaffold_tng "show_inline"
       else

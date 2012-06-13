@@ -17,6 +17,11 @@ module Esda::Scaffolding::Controller::Edit
       else
         @inline_association = nil
       end
+      if @instance.respond_to?(:extra_tab_links)
+        @extra_tab_links = @instance.extra_tab_links
+      else
+        @extra_tab_links = []
+      end
       @habtm_associations = model_class.reflect_on_all_associations.find_all{|a| 
         a.macro==:has_and_belongs_to_many
       }.sort_by{|a| 

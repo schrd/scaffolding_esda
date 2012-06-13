@@ -5,6 +5,9 @@
     <% @tab_associations.each do |assoc| %>
     <li><%= link_to(h(assoc.klass.scaffold_model_plural_name), "#tabcontent_#{assoc.name}") %></li>
     <% end %>
+    <% @extra_tab_links.each_with_index do |link, index| %>
+    <li><%= link_to(h(link[:name]), link[:url], :title=>"extra_tab_#{index}") %></li>
+    <% end %>
   </ul>
   <div id="eigenschaften">
     <% form_tag({:action=>'update', :id=>@instance.id}, {:multipart => true}) do %>
@@ -53,6 +56,9 @@
   <div id="tabcontent_<%= assoc.name %>">
     <%= has_many_association_tab(assoc) %>
   </div>
+  <% end %>
+  <% @extra_tab_links.each_with_index do |link, index|%>
+  <%= content_tag("div", "", :id=>"extra_tab_#{index}") %>
   <% end %>
 </div>
 <script>
