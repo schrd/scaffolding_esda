@@ -6,8 +6,10 @@
     <% @tab_associations.each do |assoc| %>
     <li><%= link_to(h(assoc.klass.scaffold_model_plural_name), "#tabcontent_#{assoc.name}") %></li>
     <% end %>
-    <% @extra_tab_links.each_with_index do |link, index| %>
-    <li><%= link_to(h(link[:name]), link[:url], :title=>"extra_tab_#{index}") %></li>
+    <% if @extra_tab_links %>
+      <% @extra_tab_links.each_with_index do |link, index| %>
+        <li><%= link_to(h(link[:name]), link[:url], :title=>"extra_tab_#{index}") %></li>
+      <% end %>
     <% end %>
   </ul>
   <div id="eigenschaften">
@@ -37,8 +39,10 @@
     <%= has_many_association_tab(assoc) %>
   </div>
   <% end %>
-  <% @extra_tab_links.each_with_index do |link, index|%>
-  <%= content_tag("div", "", :id=>"extra_tab_#{index}") %>
+  <% if @extra_tab_links %>
+    <% @extra_tab_links.each_with_index do |link, index|%>
+      <%= content_tag("div", "", :id=>"extra_tab_#{index}") %>
+    <% end %>
   <% end %>
 </div>
 <%= footer_below_tabs(@instance) %>
