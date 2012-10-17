@@ -61,7 +61,7 @@ module Esda::Scaffolding::Model
     end
     def scaffold_fields
       return @scaffold_fields if @scaffold_fields
-      @scaffold_fields = columns.reject{|c| c.primary || c.name =~ /_count$/ || c.name == inheritance_column || c.name =~ /^lock_version$/ || c.name =~ /^(created|updated)_(at|by)$/ }.collect{|c| c.name}
+      @scaffold_fields = columns.reject{|c| c.name == self.primary_key || c.name =~ /_count$/ || c.name == inheritance_column || c.name =~ /^lock_version$/ || c.name =~ /^(created|updated)_(at|by)$/ }.collect{|c| c.name}
       reflect_on_all_associations.each do |reflection|
         next unless reflection.macro == :belongs_to
         @scaffold_fields.delete((reflection.options[:foreign_key] || reflection.klass.table_name.classify.foreign_key).to_s)
