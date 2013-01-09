@@ -128,6 +128,18 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       }.join().html_safe + invisible_fields.map{|inv_f| hidden_field_tag('invisible_fields[]', inv_f)}.join().html_safe + lock_field
     ) 
   end
+
+  def record_form_header(model, options)
+    fields = model.scaffold_fields
+    invisible_fields = options[:invisible_fields] || []
+    fields -= invisible_fields
+    content_tag('tr',
+      fields.map{|f|
+        content_tag('th', scaffold_field_name(model, f))
+      }
+    )
+  end
+
   def record_form_quer_zeile(record, options={})
     model = record.class
     fields = record.class.scaffold_fields
@@ -147,7 +159,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         if fixed_fields.include?(f)
           field_element = scaffold_value(record, f)
         else
-          field_element = scaffold_field(record, f, name_prefix)
+          field_element = scaffold_field(record, f, name_prefix, options)
         end
         if count==1
           content_tag('td', field_element.to_s+hidden)
