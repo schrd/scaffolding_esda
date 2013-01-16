@@ -149,9 +149,21 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     fields -= invisible_fields
     count=0
 
+    lock_field = ""
+    if model.locking_enabled?() and not record.new_record?
+      lock_field = hidden_field_tag(html_name(model, model.locking_column, name_prefix), record.send(model.locking_column))
+    end
     hidden = invisible_fields.map{|inv_f|
-        hidden_field_tag(html_name(model, inv_f, name_prefix), record.send(inv_f))
-    }.join()
+        colname = model.column_name_by_attribute(inv_f)
+        val = record.send(colname)
+        if val.class==TrueClass
+          val = 't'
+        elsif val.class == FalseClass
+          val = 'f'
+        end
+        hidden_field_tag(html_name(model, colname, name_prefix), val)
+      }.join().html_safe + invisible_fields.map{|inv_f| hidden_field_tag('invisible_fields[]', inv_f)}.join().html_safe + lock_field
+
     content_tag('tr',
       fields.map{|f|
         field_element = nil
