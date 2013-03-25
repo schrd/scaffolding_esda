@@ -1,7 +1,7 @@
-<h1><%= h(@instance.class.scaffold_model_name) %> bearbeiten</h1>
+<h1><%= h(_("Edit %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}) %></h1>
 <div id="tabs">
   <ul>
-    <li><a href="#eigenschaften">Eigenschaften</a></li>
+    <li><a href="#eigenschaften"><%= h(_("Properties")) %></a></li>
     <% @tab_associations.each do |assoc| %>
       <li><%= link_to(h(assoc.klass.scaffold_model_plural_name), "#tabcontent_#{assoc.name}") %></li>
     <% end %>
@@ -17,18 +17,18 @@
       <% if params.has_key?(:redirect_to) %>
       <%= hidden_field_tag("redirect_to", params[:redirect_to]) %>
       <% end %>
-      <%= submit_tag 'Speichern' %>
+      <%= submit_tag(h(_('Save'))) %>
     <% end %>
 
-    <%= link_to(image_tag("find.png") + " #{h(@instance.class.scaffold_model_plural_name)} auflisten", :action=>'browse') %>
+    <%= link_to(image_tag("find.png") + h(_("Browse %{model_name}") % {:model_name=>@instance.class.scaffold_model_plural_name}), :action=>'browse') %>
     <br/>
-    <%= link_to(image_tag("filenew.png") + " #{h(@instance.class.scaffold_model_name)} neu erzeugen", :action=>'new') %>
+    <%= link_to(image_tag("filenew.png") + h(_("Create new %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}), :action=>'new') %>
     <br/>
-    <%= link_to(image_tag("editcopy.png") + " #{h(@instance.class.scaffold_model_name)} kopieren", :action=>'new', :clone_from=>@instance.id) %>
+    <%= link_to(image_tag("editcopy.png") + h(_("Copy %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}), :action=>'new', :clone_from=>@instance.id) %>
     <% if @inline_association %>
       <div class="inlineassoc">
       <% assoc = @inline_association %>
-      <h2><%= h(assoc.klass.scaffold_model_plural_name) %></h2>
+      <h2><%= h(_(assoc.klass.scaffold_model_plural_name)) %></h2>
       <%= content_tag('div', '',
         :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.primary_key_name}]=#{@instance.id}",
         :header_url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"headerspec"),
@@ -36,10 +36,10 @@
         :class=>'livegrid'
       ) %>
       <%= content_tag('div', '', :class=>'newdialog', 
-            :title=>"#{h(assoc.klass.scaffold_model_name)} neu anlegen"
+            :title=>h(_("Create new %{model_name}" % {:model_name=>assoc.klass.scaffold_model_name}))
     ) %>
       <%= link_to(
-            image_tag("filenew.png") + " #{h(assoc.klass.scaffold_model_name)} neu anlegen", 
+            image_tag("filenew.png") + h(_("Create new %{model_name}") % {:model_name=>assoc.klass.scaffold_model_name}), 
             {
               :action=>'new', 
               :controller=>assoc.klass.name.underscore, 
@@ -51,7 +51,7 @@
     <% end %>
     <% @habtm_associations.each do |assoc| %>
       <br/>
-      <%= link_to(image_tag("edit.png") + " Zuordnungen zu #{h assoc.name.to_s.humanize} bearbeiten", :action=>"edit_#{assoc.name}", :id=>@instance.id) %>
+      <%= link_to(image_tag("edit.png") + h(_("Edit association %{association_name}") % {:association_name=>assoc.name.to_s.humanize}), :action=>"edit_#{assoc.name}", :id=>@instance.id) %>
     <% end %>
   </div>
   <% @tab_associations.each do |assoc| %>

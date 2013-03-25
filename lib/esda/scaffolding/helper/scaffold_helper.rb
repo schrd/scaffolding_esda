@@ -23,6 +23,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   # 
   #
   def scaffold_value(entry, column, link=true, cache=nil)
+    if respond_to?("#{entry.class.name.underscore}_#{column}_value")
+      return send("#{entry.class.name.underscore}_#{column}_value", entry, column, link, cache)
+    end
     return "" if entry.nil?
     if (column.to_s =~ /\./)
       assoc, rest = column.to_s.split('.', 2)
@@ -83,7 +86,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
             link_to(image_tag('editcopy.png'), url_for(:action=>'new') + "?clone_from={{#{model_class.primary_key}}}", :title=>'Kopieren') +
             link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + "/{{#{model_class.primary_key}}}", :title=>'Löschen', :onclick=>"return(confirm('{{scaffold_name}} wirklich löschen?'))") +
             has_many_links(model_class)
- 		([['Verknüpfungen', '<a class="button" onclick="findLiveGridAround(this).grid.search();">Suchen</a>', nil, nil, links]] +
+ 		([[h(_('Links')), '<a class="button" onclick="findLiveGridAround(this).grid.search();">Suchen</a>', nil, nil, links]] +
 		model_class.scaffold_browse_fields.map{|f|
       [scaffold_field_name(model_class, f), 
         input_search(model_class, f).to_s, 
@@ -120,9 +123,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   end
   def scaffold_field_name(record, column)
     if record.is_a?(ActiveRecord::Base)
-      return h(record.class.scaffold_field_name(column))
+      return h(_(record.class.scaffold_field_name(column)))
     else
-      return h(record.scaffold_field_name(column))
+      return h(_(record.scaffold_field_name(column)))
     end
   end
 
@@ -258,10 +261,10 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       :class=>'livegridDeferred'
     ) +
     content_tag('div', '', :class=>'newdialog', 
-      :title=>"#{h(assoc.klass.scaffold_model_name)} neu anlegen"
+      :title=>h(_("Create new %{model_name}" % {:model_name=>assoc.klass.scaffold_model_name}))
     ) +
     link_to(
-      image_tag("filenew.png") + " #{h(assoc.klass.scaffold_model_name)} neu anlegen", 
+      image_tag("filenew.png") + h(_("Create new %{model_name}" % {:model_name=>assoc.klass.scaffold_model_name})), 
       {
         :action=>'new', 
         :controller=>assoc.klass.name.underscore, 

@@ -1,10 +1,10 @@
-<h1><%= h(@instance.class.scaffold_model_name) %> anzeigen</h1>
+<h1><%= h(_("Show %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}) %></h1>
 <%= header_above_tabs(@instance) %>
 <div id="tabs">
   <ul>
-    <li><a href="#eigenschaften">Eigenschaften</a></li>
+    <li><a href="#eigenschaften"><%= h(_("Properties"))%></a></li>
     <% @tab_associations.each do |assoc| %>
-    <li><%= link_to(h(assoc.klass.scaffold_model_plural_name), "#tabcontent_#{assoc.name}") %></li>
+    <li><%= link_to(h(_(assoc.klass.scaffold_model_plural_name)), "#tabcontent_#{assoc.name}") %></li>
     <% end %>
     <% if @extra_tab_links %>
       <% @extra_tab_links.each_with_index do |link, index| %>
@@ -14,11 +14,11 @@
   </ul>
   <div id="eigenschaften">
     <%= record_show(@instance, {:timestamps=>true}) %>
-    <%= link_to(image_tag("find.png") + " #{h(@instance.class.scaffold_model_plural_name)} auflisten", :action=>'browse') %>
+    <%= link_to(image_tag("find.png") + h(_("Browse %{model_name}") % {:model_name=>@instance.class.scaffold_model_plural_name}), :action=>'browse') %>
     <br/>
-    <%= link_to (image_tag("edit.png") + " #{h(@instance.class.scaffold_model_name)} bearbeiten", :action=>'edit', :id=>@instance.id) %>
+    <%= link_to(image_tag("filenew.png") + h(_("Create new %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}), :action=>'new') %>
     <br/>
-    <%= link_to (image_tag("editcopy.png") + " #{h(@instance.class.scaffold_model_name)} kopieren", :action=>'new', :clone_from=>@instance.id) %>
+    <%= link_to(image_tag("editcopy.png") + h(_("Copy %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}), :action=>'new', :clone_from=>@instance.id) %>
     <% if @inline_association %>
       <div class="inlineassoc">
       <% assoc = @inline_association %>
@@ -32,7 +32,7 @@
       </div>
     <% end %>
     <br/>
-    <%= link_to(h("Veränderungen anzeigen"), :action=>'history', :id=>@instance.id) %>
+    <%= link_to(h(_("Show changes")), :action=>'history', :id=>@instance.id) %>
   </div>
   <% @tab_associations.each do |assoc| %>
   <div id="tabcontent_<%= assoc.name %>">

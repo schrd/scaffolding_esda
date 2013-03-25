@@ -1,8 +1,8 @@
-<h1><%= h(@instance.class.scaffold_model_name) %> neu anlegen</h1>
+<h1><%= h(_("Create new %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}) %></h1>
 <%= content_tag('div', h(flash[:error]), :class=>'error') if flash[:error] and request.xhr? %>
 <% form_tag({:action=>'create'}, {:multipart => true}) do %>
   <%= record_form(@instance, @options) %>
-  <%= submit_tag 'Anlegen' %>
+  <%= submit_tag(h(_('Create'))) %>
   <% if params.has_key?(:redirect_to) %>
     <%= hidden_field_tag('redirect_to', params[:redirect_to]) %>
   <% end %>
