@@ -1,4 +1,4 @@
-<h1><%= h(_("Edit %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}) %></h1>
+<h1><%= h(_("Edit %{model_name}") % {:model_name=>_(@instance.class.scaffold_model_name)}) %></h1>
 <div id="tabs">
   <ul>
     <li><a href="#eigenschaften"><%= h(_("Properties")) %></a></li>
@@ -20,11 +20,13 @@
       <%= submit_tag(h(_('Save'))) %>
     <% end %>
 
-    <%= link_to(image_tag("find.png") + h(_("Browse %{model_name}") % {:model_name=>@instance.class.scaffold_model_plural_name}), :action=>'browse') %>
+    <%= link_to(image_tag("filefind.png") + h(_("Show %{model_name}") % {:model_name=>_(@instance.class.scaffold_model_name)}), :action=>'show', :id=>@instance.id) %>
     <br/>
-    <%= link_to(image_tag("filenew.png") + h(_("Create new %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}), :action=>'new') %>
+    <%= link_to(image_tag("find.png") + h(_("Browse %{model_name}") % {:model_name=>_(@instance.class.scaffold_model_plural_name)}), :action=>'browse') %>
     <br/>
-    <%= link_to(image_tag("editcopy.png") + h(_("Copy %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}), :action=>'new', :clone_from=>@instance.id) %>
+    <%= link_to(image_tag("filenew.png") + h(_("Create new %{model_name}") % {:model_name=>_(@instance.class.scaffold_model_name)}), :action=>'new') %>
+    <br/>
+    <%= link_to(image_tag("editcopy.png") + h(_("Copy %{model_name}") % {:model_name=>_(@instance.class.scaffold_model_name)}), :action=>'new', :clone_from=>@instance.id) %>
     <% if @inline_association %>
       <div class="inlineassoc">
       <% assoc = @inline_association %>
