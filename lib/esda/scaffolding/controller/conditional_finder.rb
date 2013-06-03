@@ -33,6 +33,14 @@ module Esda::Scaffolding::Controller::ConditionalFinder
         param_name = field.to_sym
       end
       next unless params_part.has_key?(param_name.to_sym)
+      if model_class2.respond_to?("build_conditions_for_#{field}")
+        field_conditions, field_condition_params = model_class2.send("build_conditions_for_#{field}", table, params_part, param_name)
+        if field_conditions.is_a?(Array) and field_condition_params.is_a?(Array)
+          conditions.concat(field_conditions)
+          condition_params.concat(field_condition_params)
+        end
+        next
+      end
       column = model_class2.columns_hash[field]
       case column.type
       when :string, :text

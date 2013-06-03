@@ -145,16 +145,21 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       column = model_class2.columns_hash[field]
       param_column_name = column_name
     else
+      model_class2 = record_class
+      param_column_name = column
+      field = column
       column = record_class.columns_hash[record_class.column_name_by_attribute(column)]
-      return if column.nil?
-      param_column_name = column.name
+      param_column_name = column.name unless column.nil?
     end
-    return if column.nil?
-    record_name = record_class.to_s.underscore
 
-    value = ((params[options[:param]][record_name.to_sym][column.name.to_sym] rescue params[:search][record_name.to_sym][column.name.to_sym]) rescue  nil)
+    value = ((params[options[:param]][record_name.to_sym][param_column_name.to_sym] rescue params[:search][record_name.to_sym][param_column_name.to_sym]) rescue  nil)
     #logger.debug("Wert von #{record_name}.#{column.name}: " + value.inspect)
     prefix = (options.has_key?(:param) ? options[:param].to_s : "search")
+    record_name = record_class.to_s.underscore
+    if respond_to?("input_search_for_#{model_class2.name.underscore}_#{field}")
+      return self.send("input_search_for_#{model_class2.name.underscore}_#{field}", record_name, param_column_name, prefix, value, options)
+    end
+    return if column.nil?
     case column.type
     when :string, :text
       to_input_search_field_tag(record_name, param_column_name, prefix, value)
