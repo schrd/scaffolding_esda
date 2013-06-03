@@ -312,7 +312,11 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         html_options[:rows] = opt['rows'] if opt.is_a?(Hash) && opt.has_key?('rows')
         html_options[:cols] = opt['cols'] if opt.is_a?(Hash) && opt.has_key?('cols')
         html_options[:id] = html_id(model, field, name_prefix)
-        text_area_tag(html_name(model, field, name_prefix), record.send(field), html_options)
+        if model.serialized_attributes.keys.include?(field.to_s)
+          text_area_tag(html_name(model, field, name_prefix), record.send(field).to_yaml, html_options)
+        else
+          text_area_tag(html_name(model, field, name_prefix), record.send(field), html_options)
+        end
       when :boolean
         select_tag(html_name(model, field, name_prefix),
                    options_for_select([["", nil], ["Ja", "t"],["Nein", "f"]], record.send(field).to_s.slice(0...1)),
