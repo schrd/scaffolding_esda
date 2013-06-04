@@ -136,6 +136,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   end
   def input_search(record_class, column, options = {})
     column_name = column
+    record_name = record_class.name.underscore
     if column_name.to_s =~ /\./
       includes, join_deps = record_class.browse_include_fields2
       jd = ActiveRecord::Associations::ClassMethods::JoinDependency.new(record_class, includes, nil)
