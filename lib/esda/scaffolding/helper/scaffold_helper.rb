@@ -86,7 +86,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
             link_to(image_tag('editcopy.png'), url_for(:action=>'new') + "?clone_from={{#{model_class.primary_key}}}", :title=>'Kopieren') +
             link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + "/{{#{model_class.primary_key}}}", :title=>'Löschen', :onclick=>"return(confirm('{{scaffold_name}} wirklich löschen?'))") +
             has_many_links(model_class)
- 		([[h(_('Links')), '<a class="button" onclick="findLiveGridAround(this).grid.search();">Suchen</a>', nil, nil, links]] +
+ 		([[h(_('Links')), '<a class="button searchbutton">Suchen</a>', nil, nil, links]] +
 		model_class.scaffold_browse_fields.map{|f|
       [scaffold_field_name(model_class, f), 
         input_search(model_class, f).to_s, 
