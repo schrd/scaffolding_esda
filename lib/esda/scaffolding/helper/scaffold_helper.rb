@@ -187,7 +187,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     rescue
       size = {}
     end
-    tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}]", 'id'=> "#{prefix}_#{record_name}_#{column}", 'value'=>value}.merge(size))
+    tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}]", 'id'=> "#{prefix}_#{record_name}_#{column}", 'value'=>value}.merge(size)).html_safe
   end
   def to_date_search_field_tag(record_name, column, prefix, value, options)
     zusammen = "<br/>"
@@ -199,7 +199,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
              'class'=>"date_#{kind}",
                                'size'=>10}
                     )
-        }.join(zusammen)
+        }.join(zusammen).html_safe
 
   end
   def to_boolean_search_field_tag(record_name, column, prefix, value)
@@ -211,7 +211,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     options += content_tag("option", "egal", {"value"=>''})
     options += content_tag("option", "Ja", {"value"=>'true'}.merge(checked(value, 'true')))
     options += content_tag("option", "Nein", {"value"=>'false'}.merge(checked(value, 'false')))
-    content_tag("select", options, hash)
+    content_tag("select", options, hash).html_safe
   end
   def to_number_search_field_tag(record_name, column, prefix, value, options)
     from = ""
@@ -229,7 +229,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     end
     zusammen = "<br />"
     zusammen = " " if options.has_key?(:break) and options[:break]==false
-    from +
+    (from +
       tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}][from]", 
                       'id'=> "#{prefix}_#{record_name}_#{column}_from", 
           'value'=>(value[:from] rescue nil),
@@ -241,7 +241,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
                       'id'=> "#{prefix}_#{record_name}_#{column}_to", 
           'value'=>(value[:to] rescue nil),
           'class'=>'number_to',
-          }.merge(size)) 
+          }.merge(size))).html_safe
   end
   def to_belongs_to_search_field_tag(record_class, record_name, column, column_name, prefix, value, options)
     desc = (record_class.reflect_on_association(column_name.to_sym).klass.find(value).scaffold_name rescue nil)
