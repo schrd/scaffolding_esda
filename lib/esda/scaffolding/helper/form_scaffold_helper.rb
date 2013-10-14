@@ -85,7 +85,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
   def record_form_table(record, options, fields, fixed_fields, invisible_fields)
     name_prefix = options[:name_prefix] # nil default
     model = record.class
-    lock_field = ""
+    lock_field = h("")
     if model.locking_enabled?() and not record.new_record?
       lock_field = hidden_field_tag(html_name(model, model.locking_column, name_prefix), record.send(model.locking_column))
     end
@@ -135,11 +135,10 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     fields -= invisible_fields
     content_tag('tr',
       fields.map{|f|
-        content_tag('th', scaffold_field_name(model, f))
-      }
+        content_tag('th', h(scaffold_field_name(model, f)))
+      }.join().html_safe
     )
   end
-
   def record_form_quer_zeile(record, options={})
     model = record.class
     fields = record.class.scaffold_fields
@@ -149,7 +148,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     fields -= invisible_fields
     count=0
 
-    lock_field = ""
+    lock_field = h("")
     if model.locking_enabled?() and not record.new_record?
       lock_field = hidden_field_tag(html_name(model, model.locking_column, name_prefix), record.send(model.locking_column))
     end
@@ -178,7 +177,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         else
           content_tag('td', field_element)
         end
-      }.join()
+      }.join().html_safe
     ) 
   end
   # scaffolds an input field dependent on the column type
