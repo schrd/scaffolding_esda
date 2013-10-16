@@ -113,7 +113,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
                   ) + "?search[#{assoc.class_name.underscore}][#{foreignkeyfield}]={{#{model_class.primary_key}}}"
                 )
               )
-            }.join("\n")
+            }.join("\n").html_safe
           )
         ),
         :class=>"associationslist"

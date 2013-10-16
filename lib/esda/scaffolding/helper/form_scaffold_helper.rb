@@ -52,7 +52,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           fields.map{|f|
             field_element = scaffold_value(record, f, false)
             content_tag('tr',
-              content_tag('th', scaffold_field_name(record, f) + ":") +
+              content_tag('th', scaffold_field_name(record, f) + h(":")) +
               content_tag('td', field_element)
             )
           }.join().html_safe + timestamps,
