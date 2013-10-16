@@ -108,9 +108,9 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           e = nil
           e = record.errors.on(model.column_name_by_attribute(f).to_sym) unless options[:hide_validation_errors]
           eclass = e.nil? ? nil : 'error'
-          e = "'#{h(record.send(f))}' #{h(e)}" if e
+          e = "'#{h(record.send(f))}' #{h(e)}".html_safe if e
           content_tag('tr',
-            content_tag('th', scaffold_field_name(record, f) + ":") +
+            content_tag('th', scaffold_field_name(record, f) + h(":")) +
             content_tag('td', field_element)+
             content_tag('td', h(e), :class=>eclass)
           )
@@ -233,7 +233,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           count = assoc.klass.count(:conditions=>[conditions.join(" AND "), *condition_params])
         end
         if User.current_user and User.current_user.has_any_privilege?(["#{assoc.klass.name}::CREATE", "#{assoc.klass.name}::ALL", "Application::ALL"]) and options[:link_new] != false
-          inlinenew = content_tag('span', '', 
+          inlinenew = content_tag('span', h(''), 
                                          :class=>'inlinenew', 
                                          :url=>url_for( params.merge({
                                            :controller=>assoc.klass.name.underscore, 
@@ -245,7 +245,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
                                          :title=>"#{assoc.klass.scaffold_model_name} neu anlegen"
                                         )
         else
-          inlinenew = ""
+          inlinenew = "".html_safe
         end
         if (model.scaffold_column_options(field.to_s)['edit_assoc'] == true rescue false) and not record.send(assoc.primary_key_name).nil?
           editlink = link_to(image_tag('edit.png'), 
@@ -256,7 +256,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
                              :title=>"Ausgewählte #{assoc.klass.scaffold_model_name} bearbeiten", 
                              :class=>'button')
         else
-          editlink = ""
+          editlink = "".html_safe
         end
         if count < 100 and (model.scaffold_column_options(field.to_s)['custom_renderer'] != :hidden_inline_browser rescue true)
           return content_tag('div', 

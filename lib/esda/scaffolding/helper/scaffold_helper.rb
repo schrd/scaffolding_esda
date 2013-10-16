@@ -26,7 +26,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     if respond_to?("#{entry.class.name.underscore}_#{column}_value")
       return send("#{entry.class.name.underscore}_#{column}_value", entry, column, link, cache)
     end
-    return "" if entry.nil?
+    return "".html_safe if entry.nil?
     if (column.to_s =~ /\./)
       assoc, rest = column.to_s.split('.', 2)
       return scaffold_value(entry.send(assoc), rest, link, cache)
@@ -59,9 +59,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     else
       value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
       if value.class == FalseClass
-        'Nein'
+        'Nein'.html_safe
       elsif value.class == TrueClass
-        'Ja'
+        'Ja'.html_safe
       else
         silence_warnings do
           if entry.column_for_attribute(column).type == :text
