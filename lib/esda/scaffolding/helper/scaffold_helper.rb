@@ -81,12 +81,12 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   end
   def header_fields_for(model_class)
     return self.send("#{model_class.name.underscore}_header_fields".to_sym, model_class) if respond_to?("#{model_class.name.underscore}_header_fields".to_sym)
-    links = link_to(image_tag('filefind.png'), url_for(:action=>'show') + "/{{#{model_class.primary_key}}}", :title=>'Anzeigen') +
-            link_to(image_tag('edit.png'), url_for(:action=>'edit') + "/{{#{model_class.primary_key}}}", :title=>'Bearbeiten') +
-            link_to(image_tag('editcopy.png'), url_for(:action=>'new') + "?clone_from={{#{model_class.primary_key}}}", :title=>'Kopieren') +
-            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + "/{{#{model_class.primary_key}}}", :title=>'Löschen', :onclick=>"return(confirm('{{scaffold_name}} wirklich löschen?'))") +
+    links = link_to(image_tag('filefind.png'), url_for(:action=>'show') + h("/{{#{model_class.primary_key}}}"), :title=>'Anzeigen') +
+            link_to(image_tag('edit.png'), url_for(:action=>'edit') + h("/{{#{model_class.primary_key}}}"), :title=>'Bearbeiten') +
+            link_to(image_tag('editcopy.png'), url_for(:action=>'new') + h("?clone_from={{#{model_class.primary_key}}}"), :title=>'Kopieren') +
+            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + h("/{{#{model_class.primary_key}}}"), :title=>'Löschen', :onclick=>"return(confirm('{{scaffold_name}} wirklich löschen?'))") +
             has_many_links(model_class)
- 		([[h(_('Links')), '<a class="button searchbutton">Suchen</a>', nil, nil, links]] +
+ 		([[h(_('Links')), '<a class="button searchbutton">Suchen</a>'.html_safe, nil, nil, links]] +
 		model_class.scaffold_browse_fields.map{|f|
       [scaffold_field_name(model_class, f), 
         input_search(model_class, f).to_s, 
@@ -110,7 +110,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
                 link_to(h(assoc.name.to_s.capitalize), 
                   url_for(:controller=>assoc.class_name.underscore, 
                     :action=>'browse'
-                  ) + "?search[#{assoc.class_name.underscore}][#{foreignkeyfield}]={{#{model_class.primary_key}}}"
+                  ) + "?search[#{h(assoc.class_name.underscore)}][#{h(foreignkeyfield)}]={{#{h(model_class.primary_key)}}}".html_safe
                 )
               )
             }.join("\n").html_safe
@@ -294,9 +294,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       assoc = mc.reflect_on_association(field.split(".").last.to_sym)
       if assoc
         id_field = field + ".id"
-        link_to("{{#{field}.scaffold_name}}", url_for(:action=>'show', :controller=>assoc.klass.name.underscore)+ "/{{#{id_field}}}")
+        link_to(h("{{#{field}.scaffold_name}}"), url_for(:action=>'show', :controller=>assoc.klass.name.underscore)+ h("/{{#{id_field}}}"))
       else
-        "{{#{field}}}"
+        h("{{#{field}}}")
       end
     end
   end
