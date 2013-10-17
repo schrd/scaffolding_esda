@@ -16,7 +16,7 @@ module Esda::Scaffolding::Helper::LegacyHelper
     out << record_form(inst)
     out << hidden_field_tag('redirect_to', params[:redirect_to]) if params[:redirect_to].to_s != ''
     out << submit_tag(aktion)
-    out << "</form>"
+    out << "</form>".html_safe
     out
   end
   def manage_link
@@ -51,7 +51,7 @@ module ActionView
             input_block.call(record_name, record.column_for_attribute(field))
           end
         end
-        "\n<table class='#{record.class.scaffold_table_class :form}'><tbody>\n#{rows.join}</tbody></table><br />"
+        "\n<table class='#{record.class.scaffold_table_class :form}'><tbody>\n#{rows.join}</tbody></table><br />".html_safe
       end
 
       # Wraps each widget and widget label in a table row
