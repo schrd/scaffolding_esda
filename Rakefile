@@ -1,9 +1,11 @@
 require 'rubygems'
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
+#require 'rake/rdoctask'
+require 'rdoc/task'
 require 'rake/packagetask'
-require 'rake/gempackagetask'
+#require 'rake/gempackagetask'
+require "rubygems/packagetask"
 require 'spec/rake/spectask'
 PKG_NAME="scaffolding_esda"
 PKG_VERSION="0.9"
