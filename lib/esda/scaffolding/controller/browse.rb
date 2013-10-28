@@ -51,7 +51,7 @@ module Esda::Scaffolding::Controller::Browse
         ok = true
         if field =~ /\./
           includes, join_deps = browse_include_field2_data
-          jd = ActiveRecord::Associations::ClassMethods::JoinDependency.new(model, includes, nil)
+          jd = ActiveRecord::Associations::JoinDependency.new(model, includes, [])
           dep = join_deps[ field.split('.')[0..-2].join('.') ]
           table = jd.joins[dep].aliased_table_name
           model_class2 = jd.joins[join_deps[ field.split('.')[0..-2].join('.') ]].reflection.klass

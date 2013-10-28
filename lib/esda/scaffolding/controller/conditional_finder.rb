@@ -17,13 +17,13 @@ module Esda::Scaffolding::Controller::ConditionalFinder
     condition_params = []
     includes, join_deps = model_class.browse_include_fields2
     table = model_class.table_name
-    jd = ActiveRecord::Associations::ClassMethods::JoinDependency.new(model_class, includes, nil)
+    jd = ActiveRecord::Associations::JoinDependency.new(model_class, includes, [])
     (model_class.scaffold_browse_fields + model_class.scaffold_fields ).uniq.each{|sbf|
       if sbf =~ /\./
         dep = join_deps[ sbf.split('.')[0..-2].join('.') ]
         #puts "#{sbf}, #{sbf.split('.')[0..-2].join('.')}, #{dep}"
-        table = jd.joins[dep].aliased_table_name
-        model_class2 = jd.joins[join_deps[ sbf.split('.')[0..-2].join('.') ]].reflection.klass
+        table = jd.join_parts[dep].aliased_table_name
+        model_class2 = jd.join_parts[join_deps[ sbf.split('.')[0..-2].join('.') ]].reflection.klass
         field = model_class2.column_name_by_attribute(sbf.split('.').last)
         param_name = sbf.to_sym
       else

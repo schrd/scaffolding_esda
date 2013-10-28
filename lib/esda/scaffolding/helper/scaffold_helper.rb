@@ -103,9 +103,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
         content_tag('div', 
           content_tag('div',
             associations.map{|assoc|
-              foreignkeyfield = (assoc.options.has_key?(:foreign_key) ?
-                assoc.options[:foreign_key] :
-                assoc.primary_key_name)
+              foreignkeyfield = assoc.primary_key_column.name
               content_tag('div',
                 link_to(h(assoc.name.to_s.capitalize), 
                   url_for(:controller=>assoc.class_name.underscore, 
@@ -139,9 +137,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     record_name = record_class.name.underscore
     if column_name.to_s =~ /\./
       includes, join_deps = record_class.browse_include_fields2
-      jd = ActiveRecord::Associations::ClassMethods::JoinDependency.new(record_class, includes, nil)
+      jd = ActiveRecord::Associations::JoinDependency.new(record_class, includes, [])
       dep = join_deps[ column_name.split('.')[0..-2].join('.') ]
-      model_class2 = jd.joins[dep].reflection.klass
+      model_class2 = jd.join_parts[dep].reflection.klass
       field = model_class2.column_name_by_attribute(column_name.split('.').last)
       column = model_class2.columns_hash[field]
       param_column_name = column_name
