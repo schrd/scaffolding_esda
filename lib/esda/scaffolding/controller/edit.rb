@@ -45,7 +45,7 @@ module Esda::Scaffolding::Controller::Edit
       if model_class.locking_enabled?() and 
            params[params_name].has_key?(model_class.locking_column) and 
            params[params_name][model_class.locking_column].to_i < @instance.lock_version.to_i
-        raise ActiveRecord::StaleObjectError, "Attempted to update a stale object"
+        raise ActiveRecord::StaleObjectError.new(@instance, "update")
       end
       @tab_associations = model_class.reflect_on_all_associations.find_all{|a| 
         a.macro==:has_many and not a.options.has_key?(:through)

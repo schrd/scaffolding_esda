@@ -106,7 +106,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
             field_element = scaffold_field(record, f, name_prefix)
           end
           e = nil
-          e = record.errors.on(model.column_name_by_attribute(f).to_sym) unless options[:hide_validation_errors]
+          e = record.errors.get(model.column_name_by_attribute(f).to_sym) unless options[:hide_validation_errors]
           eclass = e.nil? ? nil : 'error'
           e = "'#{h(record.send(f))}' #{h(e)}".html_safe if e
           content_tag('tr',
@@ -247,11 +247,11 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         else
           inlinenew = "".html_safe
         end
-        if (model.scaffold_column_options(field.to_s)['edit_assoc'] == true rescue false) and not record.send(assoc.primary_key_name).nil?
+        if (model.scaffold_column_options(field.to_s)['edit_assoc'] == true rescue false) and not record.send(assoc.foreign_key).nil?
           editlink = link_to(image_tag('edit.png'), 
                              {:action=>'edit', 
                               :controller=>assoc.klass.name.underscore, 
-                              :id=>record.send(assoc.primary_key_name),
+                              :id=>record.send(assoc.foreign_key),
                               :redirect_to=>url_for()}, 
                              :title=>"Ausgewählte #{assoc.klass.scaffold_model_name} bearbeiten", 
                              :class=>'button')
@@ -280,8 +280,8 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         return content_tag('div',
             content_tag('span', 
               hidden_field_tag(
-                html_name(model, assoc.primary_key_name, name_prefix), 
-                record.send(assoc.primary_key_name),
+                html_name(model, assoc.foreign_key, name_prefix), 
+                record.send(assoc.foreign_key),
                 :id=>html_id(model, field, name_prefix)
               ), 
               :class=>"inlinebrowser #{css_class}",
@@ -289,7 +289,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
               :url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'browse_data'),
               :header_url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'headerspec'),
               :extra_params=>extra_params,
-              :selected_text=>(record.send(assoc.name).scaffold_name rescue '&nbsp;&nbsp;&nbsp;')
+              :selected_text=>(record.send(assoc.name).scaffold_name rescue '&nbsp;&nbsp;&nbsp;'.html_safe)
             ) + inlinenew + editlink,
             :class=>'association'
           )
@@ -327,7 +327,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         file_field_tag(html_name(model, field, name_prefix))
       end
       rescue Exception=>e
-        h(e.to_s) + " Feld " + field.to_s
+        h(e.to_s + " Feld " + field.to_s) + content_tag('pre', e.backtrace.join("\n"))
       end
     end
   end
@@ -365,12 +365,12 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           [row.scaffold_name, row.id]
         } 
     end
-    select_tag(html_name(model, assoc.primary_key_name, name_prefix), 
+    select_tag(html_name(model, assoc.foreign_key, name_prefix), 
       options_for_select([["", ""]] + data,
-        record.send(assoc.primary_key_name)
+        record.send(assoc.foreign_key)
       ),
       :class=>css_class,
-      :id=>html_id(model, assoc.primary_key_name, name_prefix)
+      :id=>html_id(model, assoc.foreign_key, name_prefix)
     )
   end
 end

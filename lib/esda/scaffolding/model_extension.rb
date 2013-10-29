@@ -158,7 +158,7 @@ module Esda::Scaffolding::Model
     def column_name_by_attribute(name)
       reflection = reflect_on_association(name.to_sym)
       if reflection
-        return reflection.primary_key_column.name
+        return reflection.foreign_key
       else
         return name
       end

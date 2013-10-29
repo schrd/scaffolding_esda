@@ -7,7 +7,7 @@ module Esda::Scaffolding::Controller::RecursiveCreator
     created_objects = {}
     associations.each {|assoc|
       # only create new association instance if there is no id assigned and parameters exist
-      if params_part and params_part.has_key?(assoc.name) and params_part[assoc.name].is_a?(Hash) and params_part[assoc.primary_key_name].blank?
+      if params_part and params_part.has_key?(assoc.name) and params_part[assoc.name].is_a?(Hash) and params_part[assoc.foreign_key].blank?
         created_objects[assoc.name] = recursively_create(assoc.klass, params_part[assoc.name])
       end
     }
@@ -27,6 +27,7 @@ module Esda::Scaffolding::Controller::RecursiveCreator
       else
         found = clone_from.attributes
       end
+      found.delete(model_class.primary_key)
     end
     instance = model_class.new(found)
     instance.valid?
@@ -59,7 +60,7 @@ module Esda::Scaffolding::Controller::RecursiveCreator
     created_objects = {}
     associations.each {|assoc|
       # only create new association instance if there is no id assigned and parameters exist
-      if params_part.has_key?(assoc.name) and params_part[assoc.name].is_a?(Hash) and params_part[assoc.primary_key_name].blank?
+      if params_part.has_key?(assoc.name) and params_part[assoc.name].is_a?(Hash) and params_part[assoc.foreign_key].blank?
         created_objects[assoc.name] = recursively_create(assoc.klass, params_part[assoc.name])
       end
     }

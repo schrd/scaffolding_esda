@@ -39,10 +39,10 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
           record_show(entry.send(column.to_s))
         end
       else
-        id = entry.send(reflection.primary_key_name)
+        id = entry.send(reflection.foreign_key)
         value = nil
         if cache.is_a?(Hash) 
-          cachekey = reflection.primary_key_name
+          cachekey = reflection.foreign_key
           cache[cachekey] = {} unless cache.has_key?(cachekey) 
           if cache[cachekey].has_key?(id)
             value = cache[cachekey][id]
@@ -259,7 +259,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   end
   def has_many_association_tab(assoc)
     content_tag('div', '',
-      :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.primary_key_name}]=#{@instance.id}",
+      :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.foreign_key}]=#{@instance.id}",
       :header_url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"headerspec"),
       :url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"browse_data"),
       :class=>'livegridDeferred'
@@ -272,8 +272,8 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       {
         :action=>'new', 
         :controller=>assoc.klass.name.underscore, 
-        "#{assoc.klass.name.underscore}[#{assoc.primary_key_name}]"=>@instance.id, 
-        :invisible_fields => [assoc.primary_key_name.to_s.sub(/_id$/, '')]
+        "#{assoc.klass.name.underscore}[#{assoc.foreign_key}]"=>@instance.id, 
+        :invisible_fields => [assoc.foreign_key.to_s.sub(/_id$/, '')]
       },
       :class=>"newdialog") 
   end
