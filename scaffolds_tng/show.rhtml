@@ -26,7 +26,7 @@
       <% assoc = @inline_association %>
       <h2><%= h(assoc.klass.scaffold_model_plural_name) %></h2>
       <%= content_tag('div', '',
-        :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.primary_key_name}]=#{@instance.id}",
+        :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.foreign_key}]=#{@instance.id}",
         :header_url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"headerspec"),
         :url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"browse_data"),
         :class=>'livegrid'
