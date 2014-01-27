@@ -80,6 +80,25 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       end
     end
   end
+  def editable_scaffold_value(entry, column, options={})
+    options = {
+      :form_url=>{:action=>'edit_field', :id=>entry.id, :field=>column},
+      :update_url=>{:action=>'update_field', :id=>entry.id, :field=>column},
+      :show_url=>{:action=>'show_field', :id=>entry.id, :field=>column},
+      :link=>true,
+      :editable=>true,
+      :css_class=>"editable"
+    }.merge(options)
+    css_class = (options[:editable] ? options[:css_class] : nil)
+    content_tag('div',
+      scaffold_value(entry, column, options[:link], options[:cache]),
+      :"data-form-url"=>url_for(options[:form_url]),
+      :"data-update-url"=>url_for(options[:update_url]),
+      :"data-show-url"=>url_for(options[:show_url]),
+      :class=>css_class
+    )
+  end
+
   def header_fields_for(model_class)
     return self.send("#{model_class.name.underscore}_header_fields".to_sym, model_class) if respond_to?("#{model_class.name.underscore}_header_fields".to_sym)
     links = link_to(image_tag('filefind.png'), url_for(:action=>'show') + h("/{{#{model_class.primary_key}}}"), :title=>'Anzeigen') +

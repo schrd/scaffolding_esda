@@ -36,6 +36,17 @@ module Esda::Scaffolding::Controller::Edit
       render :inline=>"Datensatz mit ID <%= params[:id].to_i %> nicht gefunden", :status=>404
     end
   end
+
+  def edit_field
+    @instance = model_class.find(params[:id])
+    @field = params[:field]
+    if not model_class.scaffold_fields.include?(@field)
+      render :inline=>'<%= h(_("Field %{field} does not exist") % {:field=>@field}) %>', :status=>404
+    else
+      render :inline=>"<%= scaffold_field(@instance, @field) %>"
+    end
+  end
+
   def update
     if not params.has_key?(params_name)
       return edit
@@ -87,6 +98,22 @@ module Esda::Scaffolding::Controller::Edit
       render :inline=>"Datensatz mit ID #{params[:id].to_i} nicht gefunden", :status=>404
     rescue ActiveRecord::StaleObjectError
       render :inline=>"Datensatz mit ID #{params[:id].to_i} nicht geändert. Daten wurden in der Zwischenzeit schon geändert", :status=>:conflict
+    end
+  end
+
+  def update_field
+    if not params.has_key?(params_name)
+      return edit_field
+    end
+    @instance = model_class.find(params[:id])
+    @field = params[:field]
+    if not model_class.scaffold_fields.include?(@field)
+      render :inline=>'<%= h(_("Field %{field} does not exist") % {:field=>@field}) %>', :status=>404
+    else
+      meth = "#{@field}="
+      @instance.send(meth, params[params_name][@field])
+      @instance.save!
+      render :inline=>"<%= scaffold_value(@instance, @field) %>"
     end
   end
   def list_association
