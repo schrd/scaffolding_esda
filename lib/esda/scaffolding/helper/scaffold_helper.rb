@@ -64,6 +64,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
         'Ja'.html_safe
       else
         silence_warnings do
+          value = l(value) if value.is_a?(Date)
           if entry.column_for_attribute(column).type == :text
             content_tag("div", h(value), :class=>"pre")
           elsif entry.column_for_attribute(column).type == :binary
@@ -103,7 +104,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
         content_tag('div', 
           content_tag('div',
             associations.map{|assoc|
-              foreignkeyfield = assoc.primary_key_column.name
+              foreignkeyfield = assoc.foreign_key
               content_tag('div',
                 link_to(h(assoc.name.to_s.capitalize), 
                   url_for(:controller=>assoc.class_name.underscore, 
@@ -129,8 +130,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
 
   def feldhilfe(model, method)
     id = "#{model}_#{method}_help"
-    onclick = remote_function(:update=>id, :url=>{:action=>"hilfepopup", :controller=>"feldbeschreibung", :model=>model, :methode=>method, :sprache_id=>1})
-    content_tag('span', image_tag("help.png"), :onclick=>onclick) + content_tag("span", "", :id=>id)
+    #onclick = remote_function(:update=>id, :url=>{:action=>"hilfepopup", :controller=>"feldbeschreibung", :model=>model, :methode=>method, :sprache_id=>1})
+    help = Feldbeschreibung.find_by_methode_and_model_and_sprache_id(method, model, 1).try(:beschreibung)
+    content_tag('span', image_tag("help.png"), :title=>help)
   end
   def input_search(record_class, column, options = {})
     column_name = column
