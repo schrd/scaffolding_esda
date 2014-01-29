@@ -298,7 +298,9 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       when :string, :date
         size = model.scaffold_column_options(field.to_s).try(:[], 'size')
         size = 30 if size.nil?
-        text_field_tag(html_name(model, field, name_prefix), record.send(field), :class=>css_class,
+        val = record.send(field)
+        val = l(val) if val.is_a?(Date)
+        text_field_tag(html_name(model, field, name_prefix), val, :class=>css_class,
                       :id=>html_id(model, field, name_prefix), :size=>size)
       when :integer, :decimal, :numeric, :float
         size = model.scaffold_column_options(field.to_s).try(:[], 'size')
