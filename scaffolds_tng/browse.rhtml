@@ -1,17 +1,9 @@
 <h1><%= h(_("List %{model_name}") % {:model_name=>@model.scaffold_model_plural_name}) %></h1>
-<div id="scroll"></div>
+<%= content_tag("div", "", 
+      :id=>"scroll", 
+      :class=>"livegrid", 
+      :url=>url_for(:action=>'browse_data', :controller=>@model.name.underscore), 
+      :header_url=>url_for({:search=>params[:search]}.merge({:action=>'headerspec', :controller=>@model.name.underscore})), 
+      :extra_params=>@extra_params
+) %>
 <%= link_to(image_tag("filenew.png") + h(_("Create new %{model_name}") % {:model_name=>@model.scaffold_model_name}), :action=>'new') %>
-<script>
-var header = new HeaderBase();
-header.fields = <%= header_fields_for(@model) %>;
-new LiveGrid(document.getElementById("scroll"), {
-	url: '<%= url_for(:action=>'browse_data') %>',
-	header: header,
-	height: (Math.max(window.innerHeight - 260, 200) + "px")
-<% if @extra_params %>
-
-  ,extra_params: '<%= @extra_params %>'
-<% end %>
-
-});
-</script>
