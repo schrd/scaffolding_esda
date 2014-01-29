@@ -82,9 +82,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   end
   def editable_scaffold_value(entry, column, options={})
     options = {
-      :form_url=>{:action=>'edit_field', :id=>entry.id, :field=>column},
-      :update_url=>{:action=>'update_field', :id=>entry.id, :field=>column},
-      :show_url=>{:action=>'show_field', :id=>entry.id, :field=>column},
+      :form_url=>{:action=>'edit_field', :id=>entry.id, :field=>column, :controller=>entry.class.name.underscore},
+      :update_url=>{:action=>'update_field', :id=>entry.id, :field=>column, :controller=>entry.class.name.underscore},
+      :show_url=>{:action=>'show_field', :id=>entry.id, :field=>column, :controller=>entry.class.name.underscore},
       :link=>true,
       :editable=>true,
       :css_class=>"editable"
