@@ -48,6 +48,7 @@
   <% end %>
 </div>
 <%= footer_below_tabs(@instance) %>
+<% content_for :scripts do %>
 <script>
 jQuery.noConflict();
 jQuery(document).ready(function($) {
@@ -95,4 +96,4 @@ jQuery(document).ready(function($) {
 
 });
 </script>
-
+<% end %>
