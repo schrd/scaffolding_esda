@@ -1,3 +1,5 @@
+# coding: UTF-8
+
 # defines methods which are made available in a scaffolded controller
 module Esda::Scaffolding::Controller::Browse
   include Esda::Scaffolding::Controller::ConditionalFinder
@@ -37,9 +39,9 @@ module Esda::Scaffolding::Controller::Browse
   def handle_browse_data(model, conditions, condition_params, browse_fields = nil)
     browse_fields = model.scaffold_browse_fields if browse_fields.nil?
     browse_include_field2_data = model.browse_include_fields2(browse_fields)
-    @count = model.count(:conditions=>[conditions.join(" AND "), *condition_params], :include=>browse_include_field2_data[0])
     @link = false
     @link = true if params.has_key?(:link)
+    jd = nil
     if (not params[:sort].blank?) and params[:sort] =~ /(.+) (DESC|ASC)$/
       field = $1
       sort = $2
@@ -65,11 +67,25 @@ module Esda::Scaffolding::Controller::Browse
     else
       order = model.scaffold_select_order
     end
+    @count = nil
     if model.respond_to?(:browse_find)
       @daten = model.browse_find(:conditions=>[conditions.join(" AND "), *condition_params], :offset=>params[:offset].to_i, :limit=>params[:limit].to_i, :order=>order)
     else
-      @daten = model.find(:all, :include=>browse_include_field2_data[0], :conditions=>[conditions.join(" AND "), *condition_params], :offset=>params[:offset].to_i, :limit=>params[:limit].to_i, :order=>order)
+      # try to count records from window function. saves one call to database
+      if Rails::VERSION::MAJOR < 3 and jd
+        cols = model.send(:column_aliases, jd) + ", count(*) over () as browse_total_count"
+      elsif Rails::VERSION::MAJOR >= 3 and jd
+        cols = jd.columns
+      else
+        cols = "*, count(*) over () as browse_total_count"
+      end
+      @daten = model.find(:all, :include=>browse_include_field2_data[0], :conditions=>[conditions.join(" AND "), *condition_params], :offset=>params[:offset].to_i, :limit=>params[:limit].to_i, :order=>order, :select=>cols)
+      begin
+      @count = @daten.first.try(:browse_total_count)
+      rescue NoMethodError=>ignored
+      end
     end
+    @count = model.count(:conditions=>[conditions.join(" AND "), *condition_params], :include=>browse_include_field2_data[0]) if @count.nil?
     #expires_in 20.seconds
     cache = {}
     @model = model
