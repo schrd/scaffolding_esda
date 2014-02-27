@@ -230,7 +230,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     options += content_tag("option", "egal", {"value"=>''})
     options += content_tag("option", "Ja", {"value"=>'true'}.merge(checked(value, 'true')))
     options += content_tag("option", "Nein", {"value"=>'false'}.merge(checked(value, 'false')))
-    content_tag("select", options, hash).html_safe
+    content_tag("select", options.html_safe, hash)
   end
   def to_number_search_field_tag(record_name, column, prefix, value, options)
     from = ""
