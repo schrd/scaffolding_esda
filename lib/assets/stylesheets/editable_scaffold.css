@@ -1,0 +1,11 @@
+.editable {
+	padding-left: 16px;
+	background-image: url(/assets/edit.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	border: solid transparent 1px;
+}
+.editable:hover {
+	background-color: #efefef;
+	border: inset #bbb 1px;
+}
