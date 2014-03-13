@@ -4,6 +4,7 @@
 	background-repeat: no-repeat;
 	background-position: left top;
 	border: solid transparent 1px;
+	min-height: 16px;
 }
 .editable:hover {
 	background-color: #efefef;
