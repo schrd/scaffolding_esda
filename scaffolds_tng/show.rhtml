@@ -55,12 +55,12 @@ jQuery(document).ready(function($) {
   jQuery("#tabs").tabs({
     cache: true,
     ajaxOptions: {cache:true},
-    select: function(event, ui) {
-      var livegrid = $(ui.panel).find(".livegridDeferred");
-      var dlg = $(ui.panel).find("div.newdialog");
+    activate: function(event, ui) {
+      var livegrid = $(ui.newPanel).find(".livegridDeferred");
+      var dlg = $(ui.newPanel).find("div.newdialog");
       dlg.dialog({ autoOpen: false, modal: true, width: "80%" });
       livegrid.livegrid();
-      $(ui.panel).find("a.newdialog").click(function() {
+      $(ui.newPanel).find("a.newdialog").click(function() {
         $(this).each(function(){
           dlg.dialog('open');
           dlg.load(this.href, null, function(responseText, textStatus, xhr) {
