@@ -4,6 +4,10 @@ module Esda
     end
     module Controller
     end
+    module Rails
+      class Engine < ::Rails::Engine
+      end
+    end
   end
 end
 require 'esda/scaffolding/model_extension'
