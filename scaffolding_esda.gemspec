@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   #]
   s.files = Dir[
     "lib/**/*.rb",
-    "lib/assets/**",
+    "lib/assets/**/*",
     "scaffolds_tng/**",
     "COPYING",
     "README"
