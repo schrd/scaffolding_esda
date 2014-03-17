@@ -1,0 +1,84 @@
+.livegrid {
+  border: solid #ccc 1px;
+  margin: 5px;
+  /*overflow: hidden;*/
+	background-color: #fff;
+	color: black;
+}
+.livegridcounter {
+	background-color: #fff;
+	color: black;
+}
+.scrolltable tr.head td {
+  background-color: #fff;
+  font-weight: bold;
+}
+.scrolltable tr.resizable td {
+  background: url(/assets/resize2.gif) repeat-y right;
+}
+.scrolltable tr.head td>div, .scrolltable tr.head td>div:hover {
+  position:static;
+  visibility:visible;
+  overflow:hidden;
+}
+.scrolltable tr.head td>div select, .scrolltable tr.head td>div:hover select {
+  overflow:visible;
+}
+
+.scrolltable td, .scrolltable th {
+  z-index:0;
+  border: solid 1px #ccc;
+  text-align: left;
+}
+.scrolltable td.clipped {
+  z-index:0;
+  border: solid 1px #ccc;
+  text-align: left;
+  background: url(/assets/ecke_rechts_unten.png) right bottom no-repeat;
+}
+.scrolltable td.ASC>div {
+	background: url(/assets/1uparrow.png) right center no-repeat;
+}
+.scrolltable td.DESC>div {
+	background: url(/assets/1downarrow.png) right center no-repeat;
+}
+.scrolltable td>div, .scrolltable th>div {
+  overflow: hidden;
+  color: black;
+  z-index:0;
+  position:relative;
+  margin: 1px;
+}
+.scrolltable td>div:hover {
+  overflow:visible;
+  z-index:1;
+}
+.scrolltable {
+  z-index:0;
+  background-color: white;
+  max-width: 100%;
+}
+.scrolltable td>div div.cellcontent {
+  position:absolute;
+  overflow: hidden;
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+}
+.scrolltable td>div:hover div.cellcontent {
+  position:absolute;
+  overflow: visible;
+  border: #666 solid thin;
+  background-color: #ddd;
+  z-index: 3;
+  left:-3px;
+  top: -3px;
+  padding: 2px;
+  min-width: 100%;
+}
+.scrolltable tr:nth-child(2n+1) {
+	background-color: #f4f4f4;
+}
+.scrollable {
+  z-index: 4;
+}
