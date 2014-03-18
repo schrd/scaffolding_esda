@@ -13,14 +13,14 @@
         var headerurl = elem.attr('header_url');
         var extra_params = elem.attr('extra_params');
         if (!elem.hasClass("notnull")) {
-          elem.prepend('<a class="button erease" title="Eingabe löschen"><img src="/assets/locationbar_erase.png"/></a>');
+          elem.prepend('<a class="button erease" title="Eingabe löschen"><%= image_tag("locationbar_erase.png") %></a>');
         }
         var ignore_selected_text = elem.attr('ignore_selected_text');
         if (ignore_selected_text != null) {
-          elem.append('<a class="button openib"><img src="/assets/find.png"/></a>' +
+          elem.append('<a class="button openib"><%= image_tag("find.png")%></a>' +
             '<div class="ibdialog"><div class="livegrid"></div></div>');
         } else {
-          elem.append('<span class="ib_selected_text"></span><a class="button openib"><img src="/assets/find.png"/></a>' +
+          elem.append('<span class="ib_selected_text"></span><a class="button openib"><%= image_tag("find.png")%></a>' +
             '<div class="ibdialog"><div class="livegrid"></div></div>');
         }
         var hidden_field = elem.find("input, textarea");
@@ -124,7 +124,7 @@
       var elem = $(this);
       var sel = elem.parent().find("select, input:hidden");
       var url = elem.attr('url');
-      elem.append('<a class="button"><img src="/assets/filefind.png"/></a><div class="dialoginhalt">Lade Daten</div>');
+      elem.append('<a class="button"><%= image_tag("filefind.png") %></a><div class="dialoginhalt">Lade Daten</div>');
       var link = elem.find("a");
       var dlginhalt = elem.find(".dialoginhalt")
       dlginhalt.dialog({autoOpen: false, width:"80%", title: elem.attr('title')});
@@ -161,7 +161,7 @@
       var elem = $(this);
       var sel = elem.parent().find("select, input:hidden");
       var url = elem.attr('url');
-      elem.append('<a class="button"><img src="/assets/filenew.png"/></a><div class="newinline">Lade Formular</div>');
+      elem.append('<a class="button"><%= image_tag("filenew.png") %></a><div class="newinline">Lade Formular</div>');
       var link = elem.find("a");
       var inhalt = elem.find("div.newinline");
       inhalt.hide();
@@ -173,7 +173,7 @@
             /*jQuery(this).find(".inlineshow").inlineshow({});
             jQuery(this).find(".inlinenew").inlinenew({});
             jQuery(this).find(".inlinebrowser").inlinebrowser({});*/
-            jQuery(this).prepend('<a class="button"><img src="/assets/cancel.png"/></a>');
+            jQuery(this).prepend('<a class="button"><%= image_tag("cancel.png") %></a>');
             jQuery(this).find("a:first").click(function() {
               sel.val(oldselected);
               inhalt.html("");
