@@ -96,13 +96,17 @@
 	var extra_params = elem.attr('extra_params');
         //elem.append('<div class="livegrid"></div>');
         var lg_div = this; // elem.find(".livegrid")[0];
+  var height = "300px";
+  if (elem.attr("id") == "scroll") {
+    height = (Math.max(window.innerHeight - 260, 200) + "px");
+  }
 	$.getJSON(headerurl, null, function(data) {
 		var header = new HeaderBase();
 		header.fields = data;
 		var lg = new LiveGrid(lg_div, {
 			header: header,
 			url: url,
-			height: "300px",
+			height: height,
 			extra_params: extra_params
 		});
 	});
