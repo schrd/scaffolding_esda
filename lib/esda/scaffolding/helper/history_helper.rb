@@ -8,7 +8,7 @@ module Esda::Scaffolding::Helper::HistoryHelper
       return send("#{record.class.name.underscore}_records_show_history", records, options)
     else
       model = record.class
-      fields = record.class.scaffold_fields
+      fields = record.class.scaffold_fields.dup
       if model.column_names.include?("updated_by")
         fields << "updated_by"
       end
