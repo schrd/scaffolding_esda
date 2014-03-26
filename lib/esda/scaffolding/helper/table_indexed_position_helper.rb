@@ -40,7 +40,7 @@ module Esda::Scaffolding::Helper::TableIndexedPositionHelper
         :reload_url=>url_for(:controller=>instance.class.name.underscore, 
                              :action=>'indexed_table',
                              :id=>instance.id,
-                             "#{position_model.name.underscore}[#{posision_index_association.primary_key_name}]"=>index_instance.id
+                             "#{position_model.name.underscore}[#{posision_index_association.foreign_key}]"=>index_instance.id
                             ),
         :class=>'indexedtable'
       )
@@ -49,7 +49,7 @@ module Esda::Scaffolding::Helper::TableIndexedPositionHelper
 
   def indexed_table(model, head_instance, head_field, index_instance, index_assoc, position_reverse_assoc)
     instances = model.find(:all, 
-                           :conditions=>["#{head_field}=? and #{index_assoc.primary_key_name}=?", head_instance.id, index_instance.id], 
+                           :conditions=>["#{head_field}=? and #{index_assoc.foreign_key}=?", head_instance.id, index_instance.id], 
                            :order=>model.scaffold_select_order)
     if instances.size == 0
       return content_tag('div', "Keine Positionen"), true
@@ -100,8 +100,8 @@ module Esda::Scaffolding::Helper::TableIndexedPositionHelper
             {
                   :action=>'new', :controller=>position_model.name.underscore,
                   "fixed_fields"=>[posision_index_association.name, position_reverse_assoc.name],
-                  "#{position_model.name.underscore}[#{posision_index_association.primary_key_name}]"=>index_instance.id,
-                  "#{position_model.name.underscore}[#{position_reverse_assoc.primary_key_name}]"=>instance.id,
+                  "#{position_model.name.underscore}[#{posision_index_association.foreign_key}]"=>index_instance.id,
+                  "#{position_model.name.underscore}[#{position_reverse_assoc.foreign_key}]"=>instance.id,
                     :redirect_to=>url_for()
             },
             :class=>"newdialog")

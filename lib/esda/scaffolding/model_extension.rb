@@ -9,7 +9,7 @@ module Esda::Scaffolding::Model
       self.class.columns.find_all{|col|
         not col.primary
       }.map{|col|
-        assoc = self.class.reflect_on_all_associations.find{|assoc| assoc.macro==:belongs_to and assoc.primary_key_name==col.name.to_s}
+        assoc = self.class.reflect_on_all_associations.find{|assoc| assoc.macro==:belongs_to and assoc.foreign_key==col.name.to_s}
         if assoc
           val = self.send(assoc.name)
           val = val.fixture_name if val
