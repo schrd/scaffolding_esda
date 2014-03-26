@@ -130,7 +130,7 @@ module Esda::Scaffolding::Controller::Edit
                     :class=>"livegrid", 
                     :url=>url_for(:controller=>"/"+@assoc.klass.name.underscore, :action=>"browse_data"), 
                     :header_url=>url_for(:controller=>"/"+@assoc.klass.name.underscore, :action=>"headerspec"),
-                    :extra_params=>"search[#{@assoc.klass.name.underscore}][#{@assoc.primary_key_name}]=#{@instance.id}") %>', 
+                    :extra_params=>"search[#{@assoc.klass.name.underscore}][#{@assoc.foreign_key}]=#{@instance.id}") %>', 
                     :layout=>false
   end
 end

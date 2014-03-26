@@ -120,7 +120,7 @@ module Esda::Scaffolding::Controller
 
               params_part = (params[:search][model.name.underscore.to_sym] rescue nil)
               conditions, condition_params = build_conditions(model, params_part) if params_part
-              conditions << "#\{model.table_name}.\#{model.primary_key} IN (SELECT \#{@assoc.association_foreign_key} from \#{@assoc.options[:join_table]} WHERE \#{@assoc.primary_key_name} = ?)"
+              conditions << "#\{model.table_name}.\#{model.primary_key} IN (SELECT \#{@assoc.association_foreign_key} from \#{@assoc.options[:join_table]} WHERE \#{@assoc.foreign_key} = ?)"
               condition_params << params[:id]
               handle_browse_data(model, conditions, condition_params)
             end
@@ -133,7 +133,7 @@ module Esda::Scaffolding::Controller
 
               params_part = (params[:search][model.name.underscore.to_sym] rescue nil)
               conditions, condition_params = build_conditions(model, params_part) if params_part
-              conditions << "#\{model.table_name}.\#{model.primary_key} NOT IN (SELECT \#{@assoc.association_foreign_key} from \#{@assoc.options[:join_table]} WHERE \#{@assoc.primary_key_name} = ?)"
+              conditions << "#\{model.table_name}.\#{model.primary_key} NOT IN (SELECT \#{@assoc.association_foreign_key} from \#{@assoc.options[:join_table]} WHERE \#{@assoc.foreign_key} = ?)"
               condition_params << params[:id]
               handle_browse_data(model, conditions, condition_params)
             end
