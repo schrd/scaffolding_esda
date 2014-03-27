@@ -55,6 +55,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
         end
         return link_to(h(value), :action=>'show', :controller=>reflection.class_name.underscore.to_s, :id=>id) if value and link
         return h(value.to_s) + content_tag('span', h(''), :class=>'inlineshow', :url=>url_for(:action=>'show', :controller=>"/"+reflection.class_name.underscore.to_s, :id=>id), :title=>reflection.class_name.humanize) if not link 
+        return h("")
       end
     else
       value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
@@ -66,7 +67,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
         silence_warnings do
           value = l(value) if value.is_a?(Date)
           if entry.column_for_attribute(column).type == :text
-            content_tag("div", h(value), :class=>"pre")
+            content_tag("div", content_tag("pre", h(value)), :class=>"pre")
           elsif entry.column_for_attribute(column).type == :binary
             if entry.respond_to?("#{column}_is_image?".to_sym) and entry.send("#{column}_is_image?".to_sym)
               image_tag(url_for(:action=>'download_column', :id=>entry.id, :column=>column, :controller=>entry.class.name.underscore.to_s))
