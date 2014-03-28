@@ -57,7 +57,7 @@ module Esda::Scaffolding::Model
     attr_accessor :scaffold_select_order
     attr_accessor :scaffold_select_include
     def all_models
-      Dir["#{RAILS_ROOT}/app/models/*.rb"].collect{|file|File.basename(file).sub(/\.rb$/, '')}.sort.reject{|model| (! model.camelize.constantize.ancestors.include?(self)) rescue true}
+      Dir["#{Rails.root}/app/models/*.rb"].collect{|file|File.basename(file).sub(/\.rb$/, '')}.sort.reject{|model| (! model.camelize.constantize.ancestors.include?(self)) rescue true}
     end
     def scaffold_fields
       return @scaffold_fields if @scaffold_fields
