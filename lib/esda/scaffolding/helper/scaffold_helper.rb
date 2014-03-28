@@ -70,7 +70,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
             content_tag("div", content_tag("pre", h(value)), :class=>"pre")
           elsif entry.column_for_attribute(column).type == :binary
             if entry.respond_to?("#{column}_is_image?".to_sym) and entry.send("#{column}_is_image?".to_sym)
-              image_tag(url_for(:action=>'download_column', :id=>entry.id, :column=>column, :controller=>entry.class.name.underscore.to_s))
+              content_tag("img", "", :src=>url_for(:action=>'download_column', :id=>entry.id, :column=>column, :controller=>entry.class.name.underscore.to_s))
             else
               link_to("Herunterladen", :action=>'download_column', :id=>entry.id, :column=>column, :controller=>entry.class.name.underscore.to_s)
             end
