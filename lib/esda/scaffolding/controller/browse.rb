@@ -53,8 +53,8 @@ module Esda::Scaffolding::Controller::Browse
           includes, join_deps = browse_include_field2_data
           jd = ActiveRecord::Associations::JoinDependency.new(model, includes, [])
           dep = join_deps[ field.split('.')[0..-2].join('.') ]
-          table = jd.joins[dep].aliased_table_name
-          model_class2 = jd.joins[join_deps[ field.split('.')[0..-2].join('.') ]].reflection.klass
+          table = jd.join_parts[dep].aliased_table_name
+          model_class2 = jd.join_parts[join_deps[ field.split('.')[0..-2].join('.') ]].reflection.klass
           field = model_class2.column_name_by_attribute(field.split('.').last)
           ok = false unless model_class2.column_names.include?(field)
         else
