@@ -46,7 +46,7 @@ module Esda::Scaffolding::Model
     self.class.scaffold_fields.find_all{|f|
       begin
         self.send(f) != comp.send(f)
-      rescue ActiveRecord::MissingAttributeError
+      rescue ActiveModel::MissingAttributeError
         false
       end
     }

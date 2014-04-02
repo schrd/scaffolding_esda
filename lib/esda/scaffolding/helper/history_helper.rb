@@ -58,7 +58,7 @@ module Esda::Scaffolding::Helper::HistoryHelper
                       content_tag('td', scaffold_value(rec, f, false)) 
                     end
                   end
-                rescue ActiveRecord::MissingAttributeError
+                rescue ActiveModel::MissingAttributeError
                   h("")
                 end
               }.join.html_safe
