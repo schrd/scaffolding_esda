@@ -90,6 +90,7 @@ module Esda::Scaffolding::Controller::Edit
         flash.now[:notice] = "Datensatz gespeichert"
       rescue Exception=>e
         flash.now[:error] = e
+        flash.now[:error] = e.record.errors.full_messages.inspect if e.is_a?(ActiveRecord::RecordInvalid)
         @instance, created_objects = recursively_update(@instance, params[params_name])
         status=422
       end
