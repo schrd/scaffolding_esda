@@ -45,7 +45,12 @@ module Esda::Scaffolding::Model
     raise ArgumentError unless comp.class == self.class
     self.class.scaffold_fields.find_all{|f|
       begin
-        self.send(f) != comp.send(f)
+        assoc = self.class.reflect_on_association(f.to_sym)
+        if assoc
+          self.send(assoc.foreign_key) != comp.send(assoc.foreign_key)
+        else
+           self.send(f) != comp.send(f)
+        end
       rescue ActiveModel::MissingAttributeError
         false
       end
