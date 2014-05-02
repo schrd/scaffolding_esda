@@ -66,9 +66,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       else
         silence_warnings do
           value = l(value) if value.is_a?(Date)
-          if entry.column_for_attribute(column).type == :text
+          if entry.column_for_attribute(column).try(:type) == :text
             content_tag("div", content_tag("pre", h(value)), :class=>"pre")
-          elsif entry.column_for_attribute(column).type == :binary
+          elsif entry.column_for_attribute(column).try(:type) == :binary
             if entry.respond_to?("#{column}_is_image?".to_sym) and entry.send("#{column}_is_image?".to_sym)
               content_tag("img", "", :src=>url_for(:action=>'download_column', :id=>entry.id, :column=>column, :controller=>entry.class.name.underscore.to_s))
             else
