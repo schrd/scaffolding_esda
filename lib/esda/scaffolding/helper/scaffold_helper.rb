@@ -90,6 +90,11 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       :editable=>true,
       :css_class=>"editable"
     }.merge(options)
+
+    if entry.respond_to?("#{column}_immutable?") and entry.send("#{column}_immutable?")
+      return scaffold_value(entry, column, options[:link], options[:cache])
+    end
+
     css_class = (options[:editable] ? options[:css_class] : nil)
     content_tag('div',
       scaffold_value(entry, column, options[:link], options[:cache]),

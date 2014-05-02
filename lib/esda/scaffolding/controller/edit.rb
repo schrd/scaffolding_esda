@@ -111,17 +111,21 @@ module Esda::Scaffolding::Controller::Edit
     if not model_class.scaffold_fields.include?(@field)
       render :inline=>'<%= h(_("Field %{field} does not exist") % {:field=>@field}) %>', :status=>404
     else
-      assoc = model_class.reflect_on_association(@field.to_sym)
-      if assoc
-        meth = "#{assoc.foreign_key}="
-        p = assoc.foreign_key
+      if @instance.respond_to?("#{@field}_immutable?") and @instance.send("#{@field}_immutable?")
+        render :inline=>"<%= h('You are not allowed to change this field') %>", :status=>:conflict
       else
-        meth = "#{@field}="
-        p = @field
+        assoc = model_class.reflect_on_association(@field.to_sym)
+        if assoc
+          meth = "#{assoc.foreign_key}="
+          p = assoc.foreign_key
+        else
+          meth = "#{@field}="
+          p = @field
+        end
+        @instance.send(meth, params[params_name][p])
+        @instance.save!
+        render :inline=>"<%= scaffold_value(@instance, @field) %>"
       end
-      @instance.send(meth, params[params_name][p])
-      @instance.save!
-      render :inline=>"<%= scaffold_value(@instance, @field) %>"
     end
   end
   def list_association
