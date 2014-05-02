@@ -122,7 +122,7 @@ module Esda::Scaffolding::Model
       fields = scaffold_browse_fields if fields.nil?
       elements = fields.find_all{|f| f.to_s =~ /\./}.map{|f| f.split('.')[0..-2].map{|f| f.to_sym}}
       @hierarchize_counter = 0
-      elements.sort_by(&:to_s).each{|e|
+      elements.sort_by(&:join).each{|e|
       hierarchize_fields!(includes, join_deps, e, e, index)
       }
       return includes, index
