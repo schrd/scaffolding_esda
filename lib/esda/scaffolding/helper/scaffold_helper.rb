@@ -47,18 +47,18 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
           if cache[cachekey].has_key?(id)
             value = cache[cachekey][id]
           else
-            value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
+            value = entry.send(column).respond_to?(:scaffold_name) ? entry.send(column).scaffold_name : entry.send(column)
             cache[cachekey][id] = value
           end
         else
-          value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
+          value = entry.send(column).respond_to?(:scaffold_name) ? entry.send(column).scaffold_name : entry.send(column)
         end
         return link_to(h(value), :action=>'show', :controller=>reflection.class_name.underscore.to_s, :id=>id) if value and link
         return h(value.to_s) + content_tag('span', h(''), :class=>'inlineshow', :url=>url_for(:action=>'show', :controller=>"/"+reflection.class_name.underscore.to_s, :id=>id), :title=>reflection.class_name.humanize) if not link 
         return h("")
       end
     else
-      value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
+      value = entry.send(column).respond_to?(:scaffold_name) ? entry.send(column).scaffold_name : entry.send(column)
       if value.class == FalseClass
         'Nein'.html_safe
       elsif value.class == TrueClass
