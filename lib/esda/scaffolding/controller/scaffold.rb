@@ -5,7 +5,7 @@ module Esda::Scaffolding::Controller
       @scaffold_singular_name = model_class.name
       @scaffold_plural_name = model_class.name.pluralize
       @scaffold_singular_object = @instance
-      if self.respond_to?(:set_legacy_vars)
+      if self.respond_to?(:set_legacy_vars, true)
         set_legacy_vars
       end
       layout = request.xhr? ? false : 'esda'
