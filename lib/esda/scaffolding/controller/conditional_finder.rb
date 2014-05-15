@@ -22,6 +22,7 @@ module Esda::Scaffolding::Controller::ConditionalFinder
       if sbf =~ /\./
         dep = join_deps[ sbf.split('.')[0..-2].join('.') ]
         #puts "#{sbf}, #{sbf.split('.')[0..-2].join('.')}, #{dep}"
+        # evtl jd.join_root.children benutzen
         table = jd.join_parts[dep].aliased_table_name
         model_class2 = jd.join_parts[join_deps[ sbf.split('.')[0..-2].join('.') ]].reflection.klass
         field = model_class2.column_name_by_attribute(sbf.split('.').last)

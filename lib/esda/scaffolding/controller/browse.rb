@@ -79,7 +79,7 @@ module Esda::Scaffolding::Controller::Browse
       else
         cols = "*, count(*) over () as browse_total_count"
       end
-      @daten = model.find(:all, :include=>browse_include_field2_data[0], :conditions=>[conditions.join(" AND "), *condition_params], :offset=>params[:offset].to_i, :limit=>params[:limit].to_i, :order=>order, :select=>cols)
+      @daten = model.includes(browse_include_field2_data[0]).where([conditions.join(" AND "), *condition_params]).offset(params[:offset].to_i).limit(params[:limit].to_i).order(order).select(cols)
       begin
       @count = @daten.first.try(:browse_total_count)
       rescue NoMethodError=>ignored

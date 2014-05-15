@@ -350,22 +350,26 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     data = nil
     if assoc.options[:conditions]
       assoc.klass.send(:with_scope, :find=>{:conditions=>assoc.options[:conditions]}) do
-        data = assoc.klass.find(:all, 
-            :conditions=>[conditions.join(" AND "), *condition_params], 
-            :include=>assoc.klass.scaffold_select_include,
-            :order=>assoc.klass.scaffold_select_order
+        data = assoc.klass.where(
+            [conditions.join(" AND "), *condition_params]
+          ).includes( 
+            assoc.klass.scaffold_select_include
+          ).order(
+            assoc.klass.scaffold_select_order
           ).map{|row| 
             [row.scaffold_name, row.id]
           } 
       end
     else
-      data = assoc.klass.find(:all, 
-          :conditions=>[conditions.join(" AND "), *condition_params], 
-          :include=>assoc.klass.scaffold_select_include,
-          :order=>assoc.klass.scaffold_select_order
-        ).map{|row| 
-          [row.scaffold_name, row.id]
-        } 
+        data = assoc.klass.where(
+            [conditions.join(" AND "), *condition_params]
+          ).includes( 
+            assoc.klass.scaffold_select_include
+          ).order(
+            assoc.klass.scaffold_select_order
+          ).map{|row| 
+            [row.scaffold_name, row.id]
+          } 
     end
     select_tag(html_name(model, assoc.foreign_key, name_prefix), 
       options_for_select([["", ""]] + data,
