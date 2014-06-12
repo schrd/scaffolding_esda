@@ -23,3 +23,4 @@ require 'esda/scaffolding/controller/new.rb'
 require 'esda/scaffolding/controller/show.rb'
 require 'esda/scaffolding/controller/destroy.rb'
 require "esda/scaffolding/controller/scaffold"
+require "esda/scaffolding/access_token"

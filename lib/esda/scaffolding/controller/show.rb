@@ -57,6 +57,11 @@ module Esda::Scaffolding::Controller::Show
         return
       end
       @instance = model_class.find(params[:id])
+      token = params[:token]
+      if token.blank? or not Esda::Scaffolding::AccessToken.is_valid_download_token_for?(@instance, column, token)
+        render :inline=>"Zugriff verweigert", :status=>403
+        return
+      end
       mime_type = "application/octet-stream"
       if @instance.respond_to?("mime_type_for_#{column}")
         mime_type = @instance.send("mime_type_for_#{column}")
