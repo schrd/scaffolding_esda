@@ -66,12 +66,18 @@ module Esda::Scaffolding::Controller::ConditionalFinder
         end
 
         if params_part[param_name][:from].to_s =~ regexp
-          conditions << "#{table}.#{field} >= ?"
-          condition_params << Date.strptime(params_part[param_name][:from], format)
+          begin
+            condition_params << Date.strptime(params_part[param_name][:from], format)
+            conditions << "#{table}.#{field} >= ?"
+          rescue ArgumentError=>invalid_date
+          end
         end
         if params_part[param_name][:to].to_s =~ regexp
-          conditions << "#{table}.#{field} <= ?"
-          condition_params << Date.strptime(params_part[param_name][:to], format)
+          begin
+            condition_params << Date.strptime(params_part[param_name][:to], format)
+            conditions << "#{table}.#{field} <= ?"
+          rescue ArgumentError=>invalid_date
+          end
         end
       when :integer, :float, :decimal
         regex = /^-?\d+$/
