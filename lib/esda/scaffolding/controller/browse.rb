@@ -9,7 +9,7 @@ module Esda::Scaffolding::Controller::Browse
   def browse
     @model = model_class
     @extra_params = ""
-    if params.has_key?(:search)
+    if params.has_key?(:search) and params[:search].has_key?(@model.name.underscore.to_sym)
       # only keep those parameters in extra_params that are not a visible column.
       # Parameters for visible columns are handled by header_spec functions
       # extra_params is appended to livegrid parameters for data retrieval
