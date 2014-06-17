@@ -34,13 +34,13 @@
   z-index:0;
   border: solid 1px #ccc;
   text-align: left;
-  background: url(/assets/ecke_rechts_unten.png) right bottom no-repeat;
+  background: url(<%= image_path("ecke_rechts_unten.png") %>) right bottom no-repeat;
 }
 .scrolltable td.ASC>div {
-	background: url(/assets/1uparrow.png) right center no-repeat;
+	background: url(<%= image_path("1uparrow.png") %>) right center no-repeat;
 }
 .scrolltable td.DESC>div {
-	background: url(/assets/1downarrow.png) right center no-repeat;
+	background: url(<%= image_path("1downarrow.png") %>) right center no-repeat;
 }
 .scrolltable td>div, .scrolltable th>div {
   overflow: hidden;
