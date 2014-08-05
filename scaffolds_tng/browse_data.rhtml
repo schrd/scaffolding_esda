@@ -10,22 +10,31 @@
                   rescue NoMethodError
                     val['scaffold_name']= ""
                   end
-                  row.class.scaffold_browse_fields.each{|sbf|
+                  fields.each{|sbf|
                     unless val.has_key?(sbf)
                       begin
-                      val[sbf] = row.instance_eval(sbf)
-                      parts = sbf.split(".")
-                      if (parts.size > 1)
-                        key = (parts[0...-1] + ['id']).join(".")
-                        obj = row.instance_eval(key)
-                        val[key] = (obj.is_a?(ActiveRecord::Base) ? ( obj.scaffold_name rescue obj.to_s) : obj)
-                      end
-                      if (row.class.reflect_on_association(sbf.to_sym)) 
-                        key = row.class.reflect_on_association(sbf.to_sym).primary_key_name
-                        val[key] = row.send(key)
-                        obj = row.send(sbf)
-                        val[sbf] = (obj.is_a?(ActiveRecord::Base) ? ( obj.scaffold_name rescue obj.to_s) : obj)
-                      end
+                        parts = sbf.split(".")
+                        # zusätzlich noch als JSON Objekthierarchie speichern. In Ruby sind das Hashes
+                        parent_value_holder = val
+                        parent_object = row
+                        # navigate and enrich with ids
+                        parts[0...-1].each{|part|
+                          parent_value_holder[part] = {} unless parent_value_holder.has_key?(part)
+                          parent_value_holder = parent_value_holder[part]
+                          # this is for retrieving the primary keys for each object in the hierarchy
+                          parent_object = parent_object.send(part)
+                          if parent_object.is_a?(ActiveRecord::Base)
+                            parent_value_holder["id"] = parent_object.id 
+                            parent_value_holder[parent_object.class.primary_key] = parent_object.id
+                            parent_value_holder["scaffold_name"] = (parent_object.scaffold_name rescue parent_object.to_s)
+                          end
+                        }
+                        obj = row.instance_eval(sbf)
+                        if obj.is_a?(ActiveRecord::Base)
+                          parent_value_holder[parts.last] = {"scaffold_name" => ( obj.scaffold_name rescue obj.to_s), "id"=>obj.id, obj.class.primary_key=>obj.id}
+                        else
+                          parent_value_holder[parts.last] = obj 
+                        end
                       rescue NoMethodError=>ignored
                       end
                     end

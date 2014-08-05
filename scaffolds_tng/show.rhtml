@@ -1,24 +1,32 @@
-<h1><%= h(@instance.class.scaffold_model_name) %> anzeigen</h1>
+<h1><%= h(_("Show %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}) %></h1>
+<%= header_above_tabs(@instance) %>
 <div id="tabs">
   <ul>
-    <li><a href="#eigenschaften">Eigenschaften</a></li>
+    <li><a href="#eigenschaften"><%= h(_("Properties"))%></a></li>
     <% @tab_associations.each do |assoc| %>
-    <li><%= link_to(h(assoc.klass.scaffold_model_plural_name), "#tabcontent_#{assoc.name}") %></li>
+    <li><%= link_to(h(_(assoc.klass.scaffold_model_plural_name)), "#tabcontent_#{assoc.name}") %></li>
+    <% end %>
+    <% if @extra_tab_links %>
+      <% @extra_tab_links.each_with_index do |link, index| %>
+        <li><%= link_to(h(link[:name]), link[:url], :title=>"extra_tab_#{index}") %></li>
+      <% end %>
     <% end %>
   </ul>
   <div id="eigenschaften">
     <%= record_show(@instance, {:timestamps=>true}) %>
-    <%= link_to(image_tag("find.png") + " #{h(@instance.class.scaffold_model_plural_name)} auflisten", :action=>'browse') %>
+    <%= link_to(image_tag("edit.png") + h(_("Edit %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}), :action=>'edit', :id=>@instance.id, :controller=>@instance.class.name.underscore) %>
     <br/>
-    <%= link_to (image_tag("edit.png") + " #{h(@instance.class.scaffold_model_name)} bearbeiten", :action=>'edit', :id=>@instance.id) %>
+    <%= link_to(image_tag("find.png") + h(_("Browse %{model_name}") % {:model_name=>@instance.class.scaffold_model_plural_name}), :action=>'browse') %>
     <br/>
-    <%= link_to (image_tag("editcopy.png") + " #{h(@instance.class.scaffold_model_name)} kopieren", :action=>'new', :clone_from=>@instance.id) %>
+    <%= link_to(image_tag("filenew.png") + h(_("Create new %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}), :action=>'new') %>
+    <br/>
+    <%= link_to(image_tag("editcopy.png") + h(_("Copy %{model_name}") % {:model_name=>@instance.class.scaffold_model_name}), :action=>'new', :clone_from=>@instance.id) %>
     <% if @inline_association %>
       <div class="inlineassoc">
       <% assoc = @inline_association %>
       <h2><%= h(assoc.klass.scaffold_model_plural_name) %></h2>
       <%= content_tag('div', '',
-        :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.primary_key_name}]=#{@instance.id}",
+        :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.foreign_key}]=#{@instance.id}",
         :header_url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"headerspec"),
         :url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"browse_data"),
         :class=>'livegrid'
@@ -26,26 +34,33 @@
       </div>
     <% end %>
     <br/>
-    <%= link_to(h("Veränderungen anzeigen"), :action=>'history', :id=>@instance.id) %>
+    <%= link_to(h(_("Show changes")), :action=>'history', :id=>@instance.id) %>
   </div>
   <% @tab_associations.each do |assoc| %>
   <div id="tabcontent_<%= assoc.name %>">
     <%= has_many_association_tab(assoc) %>
   </div>
   <% end %>
+  <% if @extra_tab_links %>
+    <% @extra_tab_links.each_with_index do |link, index|%>
+      <%= content_tag("div", "", :id=>"extra_tab_#{index}") %>
+    <% end %>
+  <% end %>
 </div>
+<%= footer_below_tabs(@instance) %>
+<% content_for :scripts do %>
 <script>
 jQuery.noConflict();
 jQuery(document).ready(function($) {
   jQuery("#tabs").tabs({
     cache: true,
     ajaxOptions: {cache:true},
-    select: function(event, ui) {
-      var livegrid = $(ui.panel).find(".livegridDeferred");
-      var dlg = $(ui.panel).find("div.newdialog");
+    activate: function(event, ui) {
+      var livegrid = $(ui.newPanel).find(".livegridDeferred");
+      var dlg = $(ui.newPanel).find("div.newdialog");
       dlg.dialog({ autoOpen: false, modal: true, width: "80%" });
       livegrid.livegrid();
-      $(ui.panel).find("a.newdialog").click(function() {
+      $(ui.newPanel).find("a.newdialog").click(function() {
         $(this).each(function(){
           dlg.dialog('open');
           dlg.load(this.href, null, function(responseText, textStatus, xhr) {
@@ -81,4 +96,4 @@ jQuery(document).ready(function($) {
 
 });
 </script>
-
+<% end %>

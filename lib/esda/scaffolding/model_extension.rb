@@ -9,7 +9,7 @@ module Esda::Scaffolding::Model
       self.class.columns.find_all{|col|
         not col.primary
       }.map{|col|
-        assoc = self.class.reflect_on_all_associations.find{|assoc| assoc.macro==:belongs_to and assoc.primary_key_name==col.name.to_s}
+        assoc = self.class.reflect_on_all_associations.find{|assoc| assoc.macro==:belongs_to and assoc.foreign_key==col.name.to_s}
         if assoc
           val = self.send(assoc.name)
           val = val.fixture_name if val
@@ -45,8 +45,13 @@ module Esda::Scaffolding::Model
     raise ArgumentError unless comp.class == self.class
     self.class.scaffold_fields.find_all{|f|
       begin
-        self.send(f) != comp.send(f)
-      rescue ActiveRecord::MissingAttributeError
+        assoc = self.class.reflect_on_association(f.to_sym)
+        if assoc
+          self.send(assoc.foreign_key) != comp.send(assoc.foreign_key)
+        else
+           self.send(f) != comp.send(f)
+        end
+      rescue ActiveModel::MissingAttributeError
         false
       end
     }
@@ -55,12 +60,13 @@ module Esda::Scaffolding::Model
   # all methods of this module are added to ActiveRecord::Base
   module ClassMethods
     attr_accessor :scaffold_select_order
+    attr_accessor :scaffold_select_include
     def all_models
-      Dir["#{RAILS_ROOT}/app/models/*.rb"].collect{|file|File.basename(file).sub(/\.rb$/, '')}.sort.reject{|model| (! model.camelize.constantize.ancestors.include?(self)) rescue true}
+      Dir["#{Rails.root}/app/models/*.rb"].collect{|file|File.basename(file).sub(/\.rb$/, '')}.sort.reject{|model| (! model.camelize.constantize.ancestors.include?(self)) rescue true}
     end
     def scaffold_fields
       return @scaffold_fields if @scaffold_fields
-      @scaffold_fields = columns.reject{|c| c.primary || c.name =~ /_count$/ || c.name == inheritance_column || c.name =~ /^lock_version$/ || c.name =~ /^(created|updated)_(at|by)$/ }.collect{|c| c.name}
+      @scaffold_fields = columns.reject{|c| c.name == self.primary_key || c.name =~ /_count$/ || c.name == inheritance_column || c.name =~ /^lock_version$/ || c.name =~ /^(created|updated)_(at|by)$/ }.collect{|c| c.name}
       reflect_on_all_associations.each do |reflection|
         next unless reflection.macro == :belongs_to
         @scaffold_fields.delete((reflection.options[:foreign_key] || reflection.klass.table_name.classify.foreign_key).to_s)
@@ -97,6 +103,11 @@ module Esda::Scaffolding::Model
         assoc.macro==:belongs_to
       }.map{|a| a.name}
     end
+
+    def scaffold_show_fields
+      return @scaffold_show_fields if @scaffold_show_fields
+      return scaffold_fields
+    end
     # This method is needed for determining table name aliases by ActiveRecord Join Dependencies
     # it looks though the scaffold_browse fields and generates an include parameter for 
     # ActiveRecord::Base.find
@@ -104,13 +115,14 @@ module Esda::Scaffolding::Model
     # It also generates an index hash for ActiveRecords JoinDependency logic.
     # The Joindependency is needed for generating the correct table name for
     # the conditions parameter. It is used by the ConditionalFinder module
-    def browse_include_fields2
+    def browse_include_fields2(fields = nil)
       includes = []
       join_deps = [self.name.to_sym]
       index = {}
-      elements = scaffold_browse_fields.find_all{|f| f.to_s =~ /\./}.map{|f| f.split('.')[0..-2].map{|f| f.to_sym}}
+      fields = scaffold_browse_fields if fields.nil?
+      elements = fields.find_all{|f| f.to_s =~ /\./}.map{|f| f.split('.')[0..-2].map{|f| f.to_sym}}
       @hierarchize_counter = 0
-      elements.each{|e|
+      elements.sort_by(&:join).each{|e|
       hierarchize_fields!(includes, join_deps, e, e, index)
       }
       return includes, index
@@ -151,8 +163,7 @@ module Esda::Scaffolding::Model
     def column_name_by_attribute(name)
       reflection = reflect_on_association(name.to_sym)
       if reflection
-        return reflection.options[:foreign_key] if reflection.options[:foreign_key]
-        return reflection.primary_key_name
+        return reflection.foreign_key
       else
         return name
       end

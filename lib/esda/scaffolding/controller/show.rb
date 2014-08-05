@@ -13,6 +13,11 @@ module Esda::Scaffolding::Controller::Show
       else
         @inline_association = nil
       end
+      if @instance.respond_to?(:extra_tab_links)
+        @extra_tab_links = @instance.extra_tab_links
+      else
+        @extra_tab_links = []
+      end
       if request.xhr?
         render_scaffold_tng "show_inline"
       else
@@ -52,11 +57,20 @@ module Esda::Scaffolding::Controller::Show
         return
       end
       @instance = model_class.find(params[:id])
+      token = params[:token]
+      if token.blank? or not Esda::Scaffolding::AccessToken.is_valid_download_token_for?(@instance, column, token)
+        render :inline=>"Zugriff verweigert", :status=>403
+        return
+      end
       mime_type = "application/octet-stream"
       if @instance.respond_to?("mime_type_for_#{column}")
         mime_type = @instance.send("mime_type_for_#{column}")
       end
-      send_data(@instance.send(column), :type=>mime_type)
+      filename = nil
+      if @instance.respond_to?("filename_for_#{column}")
+        filename = @instance.send("filename_for_#{column}")
+      end
+      send_data(@instance.send(column), :type=>mime_type, :filename=>filename)
 
     rescue ActiveRecord::RecordNotFound
       render :inline=>"Datensatz mit ID <%= params[:id].to_i %> nicht gefunden", :status=>404

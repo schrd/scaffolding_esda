@@ -1,0 +1,22 @@
+.record-show, .record-form {
+/*	
+ 	-moz-border-radius: 3px 3px 3px 3px;
+	border: #cccccc solid 1px;
+	*/
+}
+.record-show th, .record-form th {
+	max-width: 300px;
+	border: 1px solid #cccccc; 
+	/*background: #e6e6e6 url(/images/jquery-ui/images/ui-bg_glass_80_e6e6e6_1x400.png) 50% 50% repeat-x;*/
+	background: #e6e6e6;
+	color: #444444;
+	-moz-border-radius: 3px 3px 3px 3px;
+	text-align: right;
+	padding-right: 5px;
+}
+
+.record-show td.changed {
+	border-top: solid red 1px;
+	border-bottom: solid red 1px;
+	background-color: #FFECD7;
+}

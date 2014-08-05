@@ -17,13 +17,13 @@ module Esda::Scaffolding::Controller::ConditionalFinder
     condition_params = []
     includes, join_deps = model_class.browse_include_fields2
     table = model_class.table_name
-    jd = ActiveRecord::Associations::ClassMethods::JoinDependency.new(model_class, includes, nil)
+    jd = ActiveRecord::Associations::JoinDependency.new(model_class, includes, [])
     (model_class.scaffold_browse_fields + model_class.scaffold_fields ).uniq.each{|sbf|
       if sbf =~ /\./
         dep = join_deps[ sbf.split('.')[0..-2].join('.') ]
         #puts "#{sbf}, #{sbf.split('.')[0..-2].join('.')}, #{dep}"
-        table = jd.joins[dep].aliased_table_name
-        model_class2 = jd.joins[join_deps[ sbf.split('.')[0..-2].join('.') ]].reflection.klass
+        table = jd.join_parts[dep].aliased_table_name
+        model_class2 = jd.join_parts[join_deps[ sbf.split('.')[0..-2].join('.') ]].reflection.klass
         field = model_class2.column_name_by_attribute(sbf.split('.').last)
         param_name = sbf.to_sym
       else
@@ -33,6 +33,14 @@ module Esda::Scaffolding::Controller::ConditionalFinder
         param_name = field.to_sym
       end
       next unless params_part.has_key?(param_name.to_sym)
+      if model_class2.respond_to?("build_conditions_for_#{field}")
+        field_conditions, field_condition_params = model_class2.send("build_conditions_for_#{field}", table, params_part, param_name)
+        if field_conditions.is_a?(Array) and field_condition_params.is_a?(Array)
+          conditions.concat(field_conditions)
+          condition_params.concat(field_condition_params)
+        end
+        next
+      end
       column = model_class2.columns_hash[field]
       case column.type
       when :string, :text
@@ -58,12 +66,18 @@ module Esda::Scaffolding::Controller::ConditionalFinder
         end
 
         if params_part[param_name][:from].to_s =~ regexp
-          conditions << "#{table}.#{field} >= ?"
-          condition_params << Date.strptime(params_part[param_name][:from], format)
+          begin
+            condition_params << Date.strptime(params_part[param_name][:from], format)
+            conditions << "#{table}.#{field} >= ?"
+          rescue ArgumentError=>invalid_date
+          end
         end
         if params_part[param_name][:to].to_s =~ regexp
-          conditions << "#{table}.#{field} <= ?"
-          condition_params << Date.strptime(params_part[param_name][:to], format)
+          begin
+            condition_params << Date.strptime(params_part[param_name][:to], format)
+            conditions << "#{table}.#{field} <= ?"
+          rescue ArgumentError=>invalid_date
+          end
         end
       when :integer, :float, :decimal
         regex = /^-?\d+$/

@@ -1,3 +1,30 @@
+function getScrollBarWidth () {
+  var inner = document.createElement('p');
+  inner.style.width = "100%";
+  inner.style.height = "200px";
+
+  var outer = document.createElement('div');
+  outer.style.position = "absolute";
+  outer.style.top = "0px";
+  outer.style.left = "0px";
+  outer.style.visibility = "hidden";
+  outer.style.width = "200px";
+  outer.style.height = "150px";
+  outer.style.overflow = "hidden";
+  outer.appendChild (inner);
+
+  document.body.appendChild (outer);
+  var w1 = inner.offsetWidth;
+  outer.style.overflow = 'scroll';
+  var w2 = inner.offsetWidth;
+  if (w1 == w2) 
+    w2 = outer.clientWidth;
+
+  document.body.removeChild (outer);
+
+  return (w1 - w2);
+};
+
 function LiveGrid(element, options) {
   element.grid = this;
   element.className = element.className + " livegrid";
@@ -30,7 +57,7 @@ function LiveGrid(element, options) {
   this.buildTable();
   this.table.style.direction = 'ltr';
   this.loadingDiv = document.createElement("div");
-  this.loadingDiv.innerHTML = '<span style="background-color: #888; -moz-opacity: 1; border: solid black thin; margin: auto; height:3em; position:absolute; top:0px; bottom: 0px;">loading data...<br/><img src="/images/mozilla_blu.gif"/></span>';
+  this.loadingDiv.innerHTML = '<span style="background-color: #888; -moz-opacity: 1; border: solid black thin; margin: auto; height:3em; position:absolute; top:0px; bottom: 0px;">loading data...<br/><%= image_tag("mozilla_blu.gif") %></span>';
   this.loadingDiv.style.visibility = "hidden";
   this.loadingDiv.style.position = "absolute";
   this.loadingDiv.style.left = "0px";
@@ -69,7 +96,7 @@ LiveGrid.prototype.setScrollableStyle = function() {
     border="none";
     overflowY = "scroll";
     overflowX = "hidden";
-    width="20px";
+    width=getScrollBarWidth() + 4 + "px";
     zIndex="4";
   }
 };
@@ -226,7 +253,7 @@ LiveGrid.prototype.buildTable = function() {
     }
     if (j==0) {
       var clear = document.createElement("img");
-      clear.src="/images/locationbar_erase.png";
+      clear.src="<%= image_path("locationbar_erase.png") %>";
       clear.title="Suchfelder leeren";
       clear.className="button";
       td.firstChild.appendChild(clear);
@@ -550,7 +577,7 @@ LiveGrid.prototype.applyData = function() {
 	  var inner = cell.firstChild.childNodes[1];
 	  if (h < parseInt(document.defaultView.getComputedStyle(inner, null).height)) {
 	    //tr.cells[j].className = "clipped";
-	    cell.style.background = "url(/images/ecke_rechts_unten.png) right bottom no-repeat";
+	    cell.style.background = "url(<%= image_path("ecke_rechts_unten.png")%>) right bottom no-repeat";
 	  } else {
 	    //tr.cells[j].className = "";
 	    cell.style.background = "";

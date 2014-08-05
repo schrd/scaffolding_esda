@@ -41,7 +41,7 @@ module Esda::Scaffolding::Controller::New
       redirect_to :action=>'edit', :id=>@instance.id
     rescue Exception=>e
       flash.now[:error] = "Datensatz nicht gespeichert: #{e} #{e.backtrace.join("<br/>")}" unless e.is_a?(ActiveRecord::RecordInvalid)
-      flash.now[:error] = "Datensatz nicht gespeichert: #{e}" if e.is_a?(ActiveRecord::RecordInvalid)
+      flash.now[:error] = "Datensatz nicht gespeichert: #{e.record.errors.full_messages.inspect}" if e.is_a?(ActiveRecord::RecordInvalid)
       # recreate objects, as they might loose their new_record? state
       @instance, created_objects = recursively_create(model_class, params[params_name])
       @options = {}

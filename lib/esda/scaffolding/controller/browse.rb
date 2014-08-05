@@ -1,3 +1,5 @@
+# coding: UTF-8
+
 # defines methods which are made available in a scaffolded controller
 module Esda::Scaffolding::Controller::Browse
   include Esda::Scaffolding::Controller::ConditionalFinder
@@ -7,7 +9,7 @@ module Esda::Scaffolding::Controller::Browse
   def browse
     @model = model_class
     @extra_params = ""
-    if params.has_key?(:search)
+    if params.has_key?(:search) and params[:search].has_key?(@model.name.underscore.to_sym)
       # only keep those parameters in extra_params that are not a visible column.
       # Parameters for visible columns are handled by header_spec functions
       # extra_params is appended to livegrid parameters for data retrieval
@@ -34,23 +36,25 @@ module Esda::Scaffolding::Controller::Browse
     handle_browse_data(model, conditions, condition_params)
   end
   private
-  def handle_browse_data(model, conditions, condition_params)
-    @count = model.count(:conditions=>[conditions.join(" AND "), *condition_params], :include=>model.browse_include_fields2[0])
+  def handle_browse_data(model, conditions, condition_params, browse_fields = nil)
+    browse_fields = model.scaffold_browse_fields if browse_fields.nil?
+    browse_include_field2_data = model.browse_include_fields2(browse_fields)
     @link = false
     @link = true if params.has_key?(:link)
+    jd = nil
     if (not params[:sort].blank?) and params[:sort] =~ /(.+) (DESC|ASC)$/
       field = $1
       sort = $2
-      if not model.scaffold_browse_fields.include?(field)
+      if not browse_fields.include?(field)
         order = model.scaffold_select_order
       else
         ok = true
         if field =~ /\./
-          includes, join_deps = model.browse_include_fields2
-          jd = ActiveRecord::Associations::ClassMethods::JoinDependency.new(model, includes, nil)
+          includes, join_deps = browse_include_field2_data
+          jd = ActiveRecord::Associations::JoinDependency.new(model, includes, [])
           dep = join_deps[ field.split('.')[0..-2].join('.') ]
-          table = jd.joins[dep].aliased_table_name
-          model_class2 = jd.joins[join_deps[ field.split('.')[0..-2].join('.') ]].reflection.klass
+          table = jd.join_parts[dep].aliased_table_name
+          model_class2 = jd.join_parts[join_deps[ field.split('.')[0..-2].join('.') ]].reflection.klass
           field = model_class2.column_name_by_attribute(field.split('.').last)
           ok = false unless model_class2.column_names.include?(field)
         else
@@ -63,16 +67,30 @@ module Esda::Scaffolding::Controller::Browse
     else
       order = model.scaffold_select_order
     end
+    @count = nil
     if model.respond_to?(:browse_find)
       @daten = model.browse_find(:conditions=>[conditions.join(" AND "), *condition_params], :offset=>params[:offset].to_i, :limit=>params[:limit].to_i, :order=>order)
     else
-      @daten = model.find(:all, :include=>model.browse_include_fields2[0], :conditions=>[conditions.join(" AND "), *condition_params], :offset=>params[:offset].to_i, :limit=>params[:limit].to_i, :order=>order)
+      # try to count records from window function. saves one call to database
+      if Rails::VERSION::MAJOR < 3 and jd
+        cols = model.send(:column_aliases, jd) + ", count(*) over () as browse_total_count"
+      elsif Rails::VERSION::MAJOR >= 3 and jd
+        cols = jd.columns
+      else
+        cols = "*, count(*) over () as browse_total_count"
+      end
+      @daten = model.find(:all, :include=>browse_include_field2_data[0], :conditions=>[conditions.join(" AND "), *condition_params], :offset=>params[:offset].to_i, :limit=>params[:limit].to_i, :order=>order, :select=>cols)
+      begin
+      @count = @daten.first.try(:browse_total_count)
+      rescue NoMethodError=>ignored
+      end
     end
+    @count = model.count(:conditions=>[conditions.join(" AND "), *condition_params], :include=>browse_include_field2_data[0]) if @count.nil?
     #expires_in 20.seconds
     cache = {}
     @model = model
     t3 = Time.now
-    json = render_to_string(:file=>scaffold_path('browse_data'), :layout=>false)
+    json = render_to_string(:file=>scaffold_path('browse_data'), :layout=>false, :locals=>{:fields=>browse_fields})
     t4 = Time.now
     render :json=>json, :layout=>false
     t2 = Time.now

@@ -1,4 +1,4 @@
-<h1><%= h(@instance.class.scaffold_model_name) %></h1>
+<h1><%= h(_(@instance.class.scaffold_model_name)) %></h1>
 <%= record_show(@instance, {:timestamps=>true}) %> 
 
-<%= link_to("ID #{@instance.id}", :id=>@instance.id, :action=>'show') %>
+<%= link_to(h(_("ID %{id}") % {:id=>@instance.id}), :id=>@instance.id, :action=>'show') %>

@@ -12,7 +12,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       return send("#{record.class.name.underscore}_record_show", record, options)
     else
       model = record.class
-      fields = record.class.scaffold_fields
+      fields = record.class.scaffold_show_fields
       name_prefix = options[:name_prefix] # nil default
       fixed_fields = options[:fixed_fields] || []
       invisible_fields = options[:invisible_fields] || []
@@ -43,7 +43,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           end
         end
         timestamps << content_tag('tr', 
-            content_tag('th', h('Zuletzt geändert')) +
+            content_tag('th', h(_('Last changed'))) +
             content_tag('td', user_text.join(" ").html_safe)
           )
       end
@@ -52,7 +52,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           fields.map{|f|
             field_element = scaffold_value(record, f, false)
             content_tag('tr',
-              content_tag('th', scaffold_field_name(record, f) + ":") +
+              content_tag('th', scaffold_field_name(record, f) + h(":")) +
               content_tag('td', field_element)
             )
           }.join().html_safe + timestamps,
@@ -85,7 +85,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
   def record_form_table(record, options, fields, fixed_fields, invisible_fields)
     name_prefix = options[:name_prefix] # nil default
     model = record.class
-    lock_field = ""
+    lock_field = h("")
     if model.locking_enabled?() and not record.new_record?
       lock_field = hidden_field_tag(html_name(model, model.locking_column, name_prefix), record.send(model.locking_column))
     end
@@ -106,11 +106,11 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
             field_element = scaffold_field(record, f, name_prefix)
           end
           e = nil
-          e = record.errors.on(model.column_name_by_attribute(f).to_sym) unless options[:hide_validation_errors]
+          e = record.errors.get(model.column_name_by_attribute(f).to_sym) unless options[:hide_validation_errors]
           eclass = e.nil? ? nil : 'error'
-          e = "'#{h(record.send(f))}' #{h(e)}" if e
+          e = "'#{h(record.send(f))}' #{h(e)}".html_safe if e
           content_tag('tr',
-            content_tag('th', scaffold_field_name(record, f) + ":") +
+            content_tag('th', scaffold_field_name(record, f) + h(":")) +
             content_tag('td', field_element)+
             content_tag('td', h(e), :class=>eclass)
           )
@@ -128,6 +128,17 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       }.join().html_safe + invisible_fields.map{|inv_f| hidden_field_tag('invisible_fields[]', inv_f)}.join().html_safe + lock_field
     ) 
   end
+
+  def record_form_header(model, options)
+    fields = model.scaffold_fields
+    invisible_fields = options[:invisible_fields] || []
+    fields -= invisible_fields
+    content_tag('tr',
+      fields.map{|f|
+        content_tag('th', h(scaffold_field_name(model, f)))
+      }.join().html_safe
+    )
+  end
   def record_form_quer_zeile(record, options={})
     model = record.class
     fields = record.class.scaffold_fields
@@ -137,9 +148,21 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     fields -= invisible_fields
     count=0
 
+    lock_field = h("")
+    if model.locking_enabled?() and not record.new_record?
+      lock_field = hidden_field_tag(html_name(model, model.locking_column, name_prefix), record.send(model.locking_column))
+    end
     hidden = invisible_fields.map{|inv_f|
-        hidden_field_tag(html_name(model, inv_f, name_prefix), record.send(inv_f))
-    }.join()
+        colname = model.column_name_by_attribute(inv_f)
+        val = record.send(colname)
+        if val.class==TrueClass
+          val = 't'
+        elsif val.class == FalseClass
+          val = 'f'
+        end
+        hidden_field_tag(html_name(model, colname, name_prefix), val)
+      }.join().html_safe + invisible_fields.map{|inv_f| hidden_field_tag('invisible_fields[]', inv_f)}.join().html_safe + lock_field
+
     content_tag('tr',
       fields.map{|f|
         field_element = nil
@@ -147,18 +170,18 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         if fixed_fields.include?(f)
           field_element = scaffold_value(record, f)
         else
-          field_element = scaffold_field(record, f, name_prefix)
+          field_element = scaffold_field(record, f, name_prefix, options)
         end
         if count==1
           content_tag('td', field_element.to_s+hidden)
         else
           content_tag('td', field_element)
         end
-      }.join()
+      }.join().html_safe
     ) 
   end
   # scaffolds an input field dependent on the column type
-  def scaffold_field(record, field, name_prefix=nil)
+  def scaffold_field(record, field, name_prefix=nil, options={})
     if record.respond_to?("#{field}_immutable?") and record.send("#{field}_immutable?")
       model = record.class
       colname = model.column_name_by_attribute(field)
@@ -209,8 +232,8 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         else
           count = assoc.klass.count(:conditions=>[conditions.join(" AND "), *condition_params])
         end
-        if User.current_user and User.current_user.has_any_privilege?(["#{assoc.klass.name}::CREATE", "#{assoc.klass.name}::ALL", "Application::ALL"])
-          inlinenew = content_tag('span', '', 
+        if User.current_user and User.current_user.has_any_privilege?(["#{assoc.klass.name}::CREATE", "#{assoc.klass.name}::ALL", "Application::ALL"]) and options[:link_new] != false
+          inlinenew = content_tag('span', h(''), 
                                          :class=>'inlinenew', 
                                          :url=>url_for( params.merge({
                                            :controller=>assoc.klass.name.underscore, 
@@ -222,18 +245,18 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
                                          :title=>"#{assoc.klass.scaffold_model_name} neu anlegen"
                                         )
         else
-          inlinenew = ""
+          inlinenew = "".html_safe
         end
-        if (model.scaffold_column_options(field.to_s)['edit_assoc'] == true rescue false) and not record.send(assoc.primary_key_name).nil?
+        if (model.scaffold_column_options(field.to_s)['edit_assoc'] == true rescue false) and not record.send(assoc.foreign_key).nil?
           editlink = link_to(image_tag('edit.png'), 
                              {:action=>'edit', 
                               :controller=>assoc.klass.name.underscore, 
-                              :id=>record.send(assoc.primary_key_name),
+                              :id=>record.send(assoc.foreign_key),
                               :redirect_to=>url_for()}, 
                              :title=>"Ausgewählte #{assoc.klass.scaffold_model_name} bearbeiten", 
                              :class=>'button')
         else
-          editlink = ""
+          editlink = "".html_safe
         end
         if count < 100 and (model.scaffold_column_options(field.to_s)['custom_renderer'] != :hidden_inline_browser rescue true)
           return content_tag('div', 
@@ -257,8 +280,8 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         return content_tag('div',
             content_tag('span', 
               hidden_field_tag(
-                html_name(model, assoc.primary_key_name, name_prefix), 
-                record.send(assoc.primary_key_name),
+                html_name(model, assoc.foreign_key, name_prefix), 
+                record.send(assoc.foreign_key),
                 :id=>html_id(model, field, name_prefix)
               ), 
               :class=>"inlinebrowser #{css_class}",
@@ -266,25 +289,35 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
               :url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'browse_data'),
               :header_url=>url_for(:controller=>assoc.klass.name.underscore, :action=>'headerspec'),
               :extra_params=>extra_params,
-              :selected_text=>(record.send(assoc.name).scaffold_name rescue '&nbsp;&nbsp;&nbsp;')
+              :selected_text=>(record.send(assoc.name).scaffold_name rescue '&nbsp;&nbsp;&nbsp;'.html_safe)
             ) + inlinenew + editlink,
             :class=>'association'
           )
       end
       return case column.type
       when :string, :date
-        text_field_tag(html_name(model, field, name_prefix), record.send(field), :class=>css_class,
-                      :id=>html_id(model, field, name_prefix), :size=>30)
+        size = options[:size] || model.scaffold_column_options(field.to_s).try(:[], 'size')
+        size = 30 if size.nil?
+        val = record.send(field)
+        val = l(val) if val.is_a?(Date)
+        text_field_tag(html_name(model, field, name_prefix), val, :class=>css_class,
+                      :id=>html_id(model, field, name_prefix), :size=>size)
       when :integer, :decimal, :numeric, :float
+        size = options[:size] || model.scaffold_column_options(field.to_s).try(:[], 'size')
+        size = 30 if size.nil?
         text_field_tag(html_name(model, field, name_prefix), record.send(field).to_s.gsub(".", ","), :class=>css_class,
-                      :id=>html_id(model, field, name_prefix), :size=>30)
+                      :id=>html_id(model, field, name_prefix), :size=>size)
       when :text
         opt = model.scaffold_column_options(field.to_s)
         html_options = {:class=>css_class, :rows=>5, :cols=>80, :wrap=>'off'}
         html_options[:rows] = opt['rows'] if opt.is_a?(Hash) && opt.has_key?('rows')
         html_options[:cols] = opt['cols'] if opt.is_a?(Hash) && opt.has_key?('cols')
         html_options[:id] = html_id(model, field, name_prefix)
-        text_area_tag(html_name(model, field, name_prefix), record.send(field), html_options)
+        if model.serialized_attributes.keys.include?(field.to_s)
+          text_area_tag(html_name(model, field, name_prefix), record.send(field).to_yaml, html_options)
+        else
+          text_area_tag(html_name(model, field, name_prefix), record.send(field), html_options)
+        end
       when :boolean
         select_tag(html_name(model, field, name_prefix),
                    options_for_select([["", nil], ["Ja", "t"],["Nein", "f"]], record.send(field).to_s.slice(0...1)),
@@ -296,7 +329,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
         file_field_tag(html_name(model, field, name_prefix))
       end
       rescue Exception=>e
-        h(e.to_s) + " Feld " + field.to_s
+        h(e.to_s + " Feld " + field.to_s) + content_tag('pre', e.backtrace.join("\n"))
       end
     end
   end
@@ -319,6 +352,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
       assoc.klass.send(:with_scope, :find=>{:conditions=>assoc.options[:conditions]}) do
         data = assoc.klass.find(:all, 
             :conditions=>[conditions.join(" AND "), *condition_params], 
+            :include=>assoc.klass.scaffold_select_include,
             :order=>assoc.klass.scaffold_select_order
           ).map{|row| 
             [row.scaffold_name, row.id]
@@ -327,17 +361,18 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
     else
       data = assoc.klass.find(:all, 
           :conditions=>[conditions.join(" AND "), *condition_params], 
+          :include=>assoc.klass.scaffold_select_include,
           :order=>assoc.klass.scaffold_select_order
         ).map{|row| 
           [row.scaffold_name, row.id]
         } 
     end
-    select_tag(html_name(model, assoc.primary_key_name, name_prefix), 
+    select_tag(html_name(model, assoc.foreign_key, name_prefix), 
       options_for_select([["", ""]] + data,
-        record.send(assoc.primary_key_name)
+        record.send(assoc.foreign_key)
       ),
       :class=>css_class,
-      :id=>html_id(model, assoc.primary_key_name, name_prefix)
+      :id=>html_id(model, assoc.foreign_key, name_prefix)
     )
   end
 end

@@ -7,6 +7,8 @@ module Esda::Scaffolding::Controller::Destroy
         return(redirect_to(params[:redirect_to]))
       end
       render(:inline=>'Datensatz gelöscht', :layout=>(request.xhr? ? false : 'esda'))
+    rescue ActiveRecord::InvalidForeignKey=>e
+      render(:inline=>"Datensatz kann nicht gelöscht werden, weil er von anderen Datensätzen referenziert wird: #{e.message}", :layout=>(request.xhr? ? false : 'esda'))
     rescue ActiveRecord::RecordNotFound
       render :inline=>'Datensatz nicht gefunden', :status=>404
     end

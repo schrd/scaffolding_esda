@@ -14,9 +14,9 @@ module Esda::Scaffolding::IndexedTable
     else
       @posision_index_association = possible_associations.first
     end
-    @index_instance = index_model.find(params[@position_model.name.underscore][@posision_index_association.primary_key_name])
+    @index_instance = index_model.find(params[@position_model.name.underscore][@posision_index_association.foreign_key])
 
 
-    render :inline=>"<%= indexed_table(@position_model, @instance, @instance.class.primary_key, @index_instance, @posision_index_association.primary_key_name ) %>"
+    render :inline=>"<%= indexed_table(@position_model, @instance, @instance.class.primary_key, @index_instance, @posision_index_association.foreign_key) %>"
   end
 end

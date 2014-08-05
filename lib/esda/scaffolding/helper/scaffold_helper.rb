@@ -23,7 +23,10 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   # 
   #
   def scaffold_value(entry, column, link=true, cache=nil)
-    return "" if entry.nil?
+    if respond_to?("#{entry.class.name.underscore}_#{column}_value")
+      return send("#{entry.class.name.underscore}_#{column}_value", entry, column, link, cache)
+    end
+    return "".html_safe if entry.nil?
     if (column.to_s =~ /\./)
       assoc, rest = column.to_s.split('.', 2)
       return scaffold_value(entry.send(assoc), rest, link, cache)
@@ -36,38 +39,40 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
           record_show(entry.send(column.to_s))
         end
       else
-        id = entry.send(reflection.primary_key_name)
+        id = entry.send(reflection.foreign_key)
         value = nil
         if cache.is_a?(Hash) 
-          cachekey = reflection.primary_key_name
+          cachekey = reflection.foreign_key
           cache[cachekey] = {} unless cache.has_key?(cachekey) 
           if cache[cachekey].has_key?(id)
             value = cache[cachekey][id]
           else
-            value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
+            value = entry.send(column).respond_to?(:scaffold_name) ? entry.send(column).scaffold_name : entry.send(column)
             cache[cachekey][id] = value
           end
         else
-          value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
+          value = entry.send(column).respond_to?(:scaffold_name) ? entry.send(column).scaffold_name : entry.send(column)
         end
         return link_to(h(value), :action=>'show', :controller=>reflection.class_name.underscore.to_s, :id=>id) if value and link
         return h(value.to_s) + content_tag('span', h(''), :class=>'inlineshow', :url=>url_for(:action=>'show', :controller=>"/"+reflection.class_name.underscore.to_s, :id=>id), :title=>reflection.class_name.humanize) if not link 
+        return h("")
       end
     else
-      value = entry.send(column).methods.include?('scaffold_name') ? entry.send(column).scaffold_name : entry.send(column)
+      value = entry.send(column).respond_to?(:scaffold_name) ? entry.send(column).scaffold_name : entry.send(column)
       if value.class == FalseClass
-        'Nein'
+        'Nein'.html_safe
       elsif value.class == TrueClass
-        'Ja'
+        'Ja'.html_safe
       else
         silence_warnings do
-          if entry.column_for_attribute(column).type == :text
-            content_tag("div", h(value), :class=>"pre")
-          elsif entry.column_for_attribute(column).type == :binary
+          value = l(value) if value.is_a?(Date)
+          if entry.column_for_attribute(column).try(:type) == :text
+            content_tag("div", content_tag("pre", h(value)), :class=>"pre")
+          elsif entry.column_for_attribute(column).try(:type) == :binary
             if entry.respond_to?("#{column}_is_image?".to_sym) and entry.send("#{column}_is_image?".to_sym)
-              image_tag(url_for(:action=>'download_column', :id=>entry.id, :column=>column, :controller=>entry.class.name.underscore.to_s))
+              content_tag("img", "", :src=>download_url_for(entry, column))
             else
-              link_to("Herunterladen", :action=>'download_column', :id=>entry.id, :column=>column, :controller=>entry.class.name.underscore.to_s)
+              link_to("Herunterladen", download_url_for(entry, column))
             end
           else
             h(value)
@@ -76,14 +81,38 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       end
     end
   end
+  def editable_scaffold_value(entry, column, options={})
+    options = {
+      :form_url=>{:action=>'edit_field', :id=>entry.id, :field=>column, :controller=>entry.class.name.underscore},
+      :update_url=>{:action=>'update_field', :id=>entry.id, :field=>column, :controller=>entry.class.name.underscore},
+      :show_url=>{:action=>'show_field', :id=>entry.id, :field=>column, :controller=>entry.class.name.underscore},
+      :link=>true,
+      :editable=>true,
+      :css_class=>"editable"
+    }.merge(options)
+
+    if entry.respond_to?("#{column}_immutable?") and entry.send("#{column}_immutable?")
+      return scaffold_value(entry, column, options[:link], options[:cache])
+    end
+
+    css_class = (options[:editable] ? options[:css_class] : nil)
+    content_tag('div',
+      scaffold_value(entry, column, options[:link], options[:cache]),
+      :"data-form-url"=>url_for(options[:form_url]),
+      :"data-update-url"=>url_for(options[:update_url]),
+      :"data-show-url"=>url_for(options[:show_url]),
+      :class=>css_class
+    )
+  end
+
   def header_fields_for(model_class)
     return self.send("#{model_class.name.underscore}_header_fields".to_sym, model_class) if respond_to?("#{model_class.name.underscore}_header_fields".to_sym)
-    links = link_to(image_tag('filefind.png'), url_for(:action=>'show') + "/\#{#{model_class.primary_key}}", :title=>'Anzeigen') +
-            link_to(image_tag('edit.png'), url_for(:action=>'edit') + "/\#{#{model_class.primary_key}}", :title=>'Bearbeiten') +
-            link_to(image_tag('editcopy.png'), url_for(:action=>'new') + "?clone_from=\#{#{model_class.primary_key}}", :title=>'Kopieren') +
-            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + "/\#{#{model_class.primary_key}}", :title=>'Löschen', :onclick=>"return(confirm('\#{scaffold_name} wirklich löschen?'))") +
+    links = link_to(image_tag('filefind.png'), url_for(:action=>'show') + h("/{{#{model_class.primary_key}}}"), :title=>'Anzeigen') +
+            link_to(image_tag('edit.png'), url_for(:action=>'edit') + h("/{{#{model_class.primary_key}}}"), :title=>'Bearbeiten') +
+            link_to(image_tag('editcopy.png'), url_for(:action=>'new') + h("?clone_from={{#{model_class.primary_key}}}"), :title=>'Kopieren') +
+            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + h("/{{#{model_class.primary_key}}}"), :title=>'Löschen', :onclick=>"return(confirm('{{scaffold_name}} wirklich löschen?'))") +
             has_many_links(model_class)
- 		([['Verknüpfungen', '<a class="button" onclick="findLiveGridAround(this).grid.search();">Suchen</a>', nil, nil, links]] +
+ 		([[h(_('Links')), '<a class="button searchbutton">Suchen</a>'.html_safe, nil, nil, links]] +
 		model_class.scaffold_browse_fields.map{|f|
       [scaffold_field_name(model_class, f), 
         input_search(model_class, f).to_s, 
@@ -100,17 +129,15 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
         content_tag('div', 
           content_tag('div',
             associations.map{|assoc|
-              foreignkeyfield = (assoc.options.has_key?(:foreign_key) ?
-                assoc.options[:foreign_key] :
-                assoc.primary_key_name)
+              foreignkeyfield = assoc.foreign_key
               content_tag('div',
                 link_to(h(assoc.name.to_s.capitalize), 
                   url_for(:controller=>assoc.class_name.underscore, 
                     :action=>'browse'
-                  ) + "?search[#{assoc.class_name.underscore}][#{foreignkeyfield}]=\#{#{model_class.primary_key}}"
+                  ) + "?search[#{h(assoc.class_name.underscore)}][#{h(foreignkeyfield)}]={{#{h(model_class.primary_key)}}}".html_safe
                 )
               )
-            }.join("\n")
+            }.join("\n").html_safe
           )
         ),
         :class=>"associationslist"
@@ -120,38 +147,45 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   end
   def scaffold_field_name(record, column)
     if record.is_a?(ActiveRecord::Base)
-      return h(record.class.scaffold_field_name(column))
+      return h(_(record.class.scaffold_field_name(column)))
     else
-      return h(record.scaffold_field_name(column))
+      return h(_(record.scaffold_field_name(column)))
     end
   end
 
   def feldhilfe(model, method)
     id = "#{model}_#{method}_help"
-    onclick = remote_function(:update=>id, :url=>{:action=>"hilfepopup", :controller=>"feldbeschreibung", :model=>model, :methode=>method, :sprache_id=>1})
-    content_tag('span', image_tag("help.png"), :onclick=>onclick) + content_tag("span", "", :id=>id)
+    #onclick = remote_function(:update=>id, :url=>{:action=>"hilfepopup", :controller=>"feldbeschreibung", :model=>model, :methode=>method, :sprache_id=>1})
+    help = Feldbeschreibung.find_by_methode_and_model_and_sprache_id(method, model, 1).try(:beschreibung)
+    content_tag('span', image_tag("help.png"), :title=>help)
   end
   def input_search(record_class, column, options = {})
     column_name = column
+    record_name = record_class.name.underscore
     if column_name.to_s =~ /\./
       includes, join_deps = record_class.browse_include_fields2
-      jd = ActiveRecord::Associations::ClassMethods::JoinDependency.new(record_class, includes, nil)
+      jd = ActiveRecord::Associations::JoinDependency.new(record_class, includes, [])
       dep = join_deps[ column_name.split('.')[0..-2].join('.') ]
-      model_class2 = jd.joins[dep].reflection.klass
+      model_class2 = jd.join_parts[dep].reflection.klass
       field = model_class2.column_name_by_attribute(column_name.split('.').last)
       column = model_class2.columns_hash[field]
       param_column_name = column_name
     else
+      model_class2 = record_class
+      param_column_name = column
+      field = column
       column = record_class.columns_hash[record_class.column_name_by_attribute(column)]
-      return if column.nil?
-      param_column_name = column.name
+      param_column_name = column.name unless column.nil?
     end
-    return if column.nil?
-    record_name = record_class.to_s.underscore
 
-    value = ((params[options[:param]][record_name.to_sym][column.name.to_sym] rescue params[:search][record_name.to_sym][column.name.to_sym]) rescue  nil)
+    value = ((params[options[:param]][record_name.to_sym][param_column_name.to_sym] rescue params[:search][record_name.to_sym][param_column_name.to_sym]) rescue  nil)
     #logger.debug("Wert von #{record_name}.#{column.name}: " + value.inspect)
     prefix = (options.has_key?(:param) ? options[:param].to_s : "search")
+    record_name = record_class.to_s.underscore
+    if respond_to?("input_search_for_#{model_class2.name.underscore}_#{field}")
+      return self.send("input_search_for_#{model_class2.name.underscore}_#{field}", record_name, param_column_name, prefix, value, options)
+    end
+    return if column.nil?
     case column.type
     when :string, :text
       to_input_search_field_tag(record_name, param_column_name, prefix, value)
@@ -178,7 +212,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     rescue
       size = {}
     end
-    tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}]", 'id'=> "#{prefix}_#{record_name}_#{column}", 'value'=>value}.merge(size))
+    tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}]", 'id'=> "#{prefix}_#{record_name}_#{column}", 'value'=>value}.merge(size)).html_safe
   end
   def to_date_search_field_tag(record_name, column, prefix, value, options)
     zusammen = "<br/>"
@@ -190,7 +224,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
              'class'=>"date_#{kind}",
                                'size'=>10}
                     )
-        }.join(zusammen)
+        }.join(zusammen).html_safe
 
   end
   def to_boolean_search_field_tag(record_name, column, prefix, value)
@@ -202,7 +236,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     options += content_tag("option", "egal", {"value"=>''})
     options += content_tag("option", "Ja", {"value"=>'true'}.merge(checked(value, 'true')))
     options += content_tag("option", "Nein", {"value"=>'false'}.merge(checked(value, 'false')))
-    content_tag("select", options, hash)
+    content_tag("select", options.html_safe, hash)
   end
   def to_number_search_field_tag(record_name, column, prefix, value, options)
     from = ""
@@ -220,7 +254,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     end
     zusammen = "<br />"
     zusammen = " " if options.has_key?(:break) and options[:break]==false
-    from +
+    (from +
       tag('input', {"name"=>"#{prefix}[#{record_name}][#{column}][from]", 
                       'id'=> "#{prefix}_#{record_name}_#{column}_from", 
           'value'=>(value[:from] rescue nil),
@@ -232,7 +266,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
                       'id'=> "#{prefix}_#{record_name}_#{column}_to", 
           'value'=>(value[:to] rescue nil),
           'class'=>'number_to',
-          }.merge(size)) 
+          }.merge(size))).html_safe
   end
   def to_belongs_to_search_field_tag(record_class, record_name, column, column_name, prefix, value, options)
     desc = (record_class.reflect_on_association(column_name.to_sym).klass.find(value).scaffold_name rescue nil)
@@ -252,21 +286,21 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
   end
   def has_many_association_tab(assoc)
     content_tag('div', '',
-      :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.primary_key_name}]=#{@instance.id}",
+      :extra_params=>"search[#{assoc.klass.name.underscore}][#{assoc.foreign_key}]=#{@instance.id}",
       :header_url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"headerspec"),
       :url=>url_for(:controller=>"/"+assoc.klass.name.underscore, :action=>"browse_data"),
       :class=>'livegridDeferred'
     ) +
     content_tag('div', '', :class=>'newdialog', 
-      :title=>"#{h(assoc.klass.scaffold_model_name)} neu anlegen"
+      :title=>h(_("Create new %{model_name}" % {:model_name=>assoc.klass.scaffold_model_name}))
     ) +
     link_to(
-      image_tag("filenew.png") + " #{h(assoc.klass.scaffold_model_name)} neu anlegen", 
+      image_tag("filenew.png") + h(_("Create new %{model_name}" % {:model_name=>assoc.klass.scaffold_model_name})), 
       {
         :action=>'new', 
         :controller=>assoc.klass.name.underscore, 
-        "#{assoc.klass.name.underscore}[#{assoc.primary_key_name}]"=>@instance.id, 
-        :invisible_fields => [assoc.primary_key_name.to_s.sub(/_id$/, '')]
+        "#{assoc.klass.name.underscore}[#{assoc.foreign_key}]"=>@instance.id, 
+        :invisible_fields => [assoc.foreign_key.to_s.sub(/_id$/, '')]
       },
       :class=>"newdialog") 
   end
@@ -284,10 +318,10 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     else
       assoc = mc.reflect_on_association(field.split(".").last.to_sym)
       if assoc
-        id_field = (assocs.size == 0 ? assoc.primary_key_name : (assocs +  ['id']).join("."))
-        link_to("\#{#{field}}", url_for(:action=>'show', :controller=>assoc.klass.name.underscore)+ "/\#{#{id_field}}")
+        id_field = field + ".id"
+        link_to(h("{{#{field}.scaffold_name}}"), url_for(:action=>'show', :controller=>assoc.klass.name.underscore)+ h("/{{#{id_field}}}"))
       else
-        "\#{#{field}}"
+        h("{{#{field}}}")
       end
     end
   end
@@ -297,5 +331,23 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       h[sbf] = column_template(model_class, sbf)
     }
     h
+  end
+
+  def header_above_tabs(instance)
+    method_name = instance.class.name.underscore + "_header_above_tabs"
+    if respond_to?(method_name.to_sym)
+      self.send(method_name.to_sym, instance)
+    end
+  end
+
+  def footer_below_tabs(instance)
+    method_name = instance.class.name.underscore + "_footer_below_tabs"
+    if respond_to?(method_name.to_sym)
+      self.send(method_name.to_sym, instance)
+    end
+  end
+
+  def download_url_for(instance, column)
+    url_for(:action=>'download_column', :id=>instance.id, :controller=>instance.class.name.underscore, :column=>column, :token=>Esda::Scaffolding::AccessToken.download_token_for(instance, column))
   end
 end

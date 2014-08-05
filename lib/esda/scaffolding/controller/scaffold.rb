@@ -5,7 +5,7 @@ module Esda::Scaffolding::Controller
       @scaffold_singular_name = model_class.name
       @scaffold_plural_name = model_class.name.pluralize
       @scaffold_singular_object = @instance
-      if self.respond_to?(:set_legacy_vars)
+      if self.respond_to?(:set_legacy_vars, true)
         set_legacy_vars
       end
       layout = request.xhr? ? false : 'esda'
@@ -120,7 +120,7 @@ module Esda::Scaffolding::Controller
 
               params_part = (params[:search][model.name.underscore.to_sym] rescue nil)
               conditions, condition_params = build_conditions(model, params_part) if params_part
-              conditions << "#\{model.table_name}.\#{model.primary_key} IN (SELECT \#{@assoc.association_foreign_key} from \#{@assoc.options[:join_table]} WHERE \#{@assoc.primary_key_name} = ?)"
+              conditions << "#\{model.table_name}.\#{model.primary_key} IN (SELECT \#{@assoc.association_foreign_key} from \#{@assoc.options[:join_table]} WHERE \#{@assoc.foreign_key} = ?)"
               condition_params << params[:id]
               handle_browse_data(model, conditions, condition_params)
             end
@@ -133,7 +133,7 @@ module Esda::Scaffolding::Controller
 
               params_part = (params[:search][model.name.underscore.to_sym] rescue nil)
               conditions, condition_params = build_conditions(model, params_part) if params_part
-              conditions << "#\{model.table_name}.\#{model.primary_key} NOT IN (SELECT \#{@assoc.association_foreign_key} from \#{@assoc.options[:join_table]} WHERE \#{@assoc.primary_key_name} = ?)"
+              conditions << "#\{model.table_name}.\#{model.primary_key} NOT IN (SELECT \#{@assoc.association_foreign_key} from \#{@assoc.options[:join_table]} WHERE \#{@assoc.foreign_key} = ?)"
               condition_params << params[:id]
               handle_browse_data(model, conditions, condition_params)
             end
