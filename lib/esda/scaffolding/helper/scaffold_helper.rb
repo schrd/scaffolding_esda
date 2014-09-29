@@ -164,9 +164,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     record_name = record_class.name.underscore
     if column_name.to_s =~ /\./
       includes, join_deps = record_class.browse_include_fields2
-      jd = ActiveRecord::Associations::JoinDependency.new(record_class, includes, [])
-      dep = join_deps[ column_name.split('.')[0..-2].join('.') ]
-      model_class2 = jd.join_parts[dep].reflection.klass
+      table_alias, model_class2 = record_class.aliased_table_name_and_model_class_for(column_name.split('.')[0..-2].join('.'), includes)
       field = model_class2.column_name_by_attribute(column_name.split('.').last)
       column = model_class2.columns_hash[field]
       param_column_name = column_name

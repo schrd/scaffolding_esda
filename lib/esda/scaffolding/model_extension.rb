@@ -198,6 +198,17 @@ module Esda::Scaffolding::Model
         @scaffold_table_classes ||= {:form=>'formtable', :list=>'sortable', :show=>'sortable'}
         @scaffold_table_classes[type]
       end
+
+    def aliased_table_name_and_model_class_for(path, includes)
+      jd = ActiveRecord::Associations::JoinDependency.new(self, includes, [])
+      path_parts = path.split(".")
+      current = jd.join_root
+      path_parts.each{|part|
+        current = current.children.find{|jd| jd.reflection.name.to_s == part}
+      }
+      return current.aliased_table_name, current.reflection.klass
+    end
+
     def fixture_relevant_habtm_associations
       self.reflect_on_all_associations.find_all{|assoc| 
         assoc.macro==:has_and_belongs_to_many

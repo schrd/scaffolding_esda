@@ -20,11 +20,7 @@ module Esda::Scaffolding::Controller::ConditionalFinder
     jd = ActiveRecord::Associations::JoinDependency.new(model_class, includes, [])
     (model_class.scaffold_browse_fields + model_class.scaffold_fields ).uniq.each{|sbf|
       if sbf =~ /\./
-        dep = join_deps[ sbf.split('.')[0..-2].join('.') ]
-        #puts "#{sbf}, #{sbf.split('.')[0..-2].join('.')}, #{dep}"
-        # evtl jd.join_root.children benutzen
-        table = jd.join_parts[dep].aliased_table_name
-        model_class2 = jd.join_parts[join_deps[ sbf.split('.')[0..-2].join('.') ]].reflection.klass
+        table, model_class2 = model_class.aliased_table_name_and_model_class_for(sbf.split('.')[0..-2].join('.'), includes)
         field = model_class2.column_name_by_attribute(sbf.split('.').last)
         param_name = sbf.to_sym
       else
