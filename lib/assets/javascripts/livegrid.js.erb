@@ -332,6 +332,9 @@ LiveGrid.prototype.getReplacementBufferIndexForOffset = function(offset) {
     // does not exists -> append
     return this.buffers.length;
   }
+  // find buffer index which has the largest absolute distance to the wanted
+  // offset. This is to not throw away "near" data, so scrolling experience is
+  // better
   for(var i=0; i < this.buffer_count; i++){
     if (this.buffers[i]){
       var dist = Math.abs(this.buffers[i]['offset'] - offset);
@@ -512,6 +515,7 @@ LiveGrid.prototype.update_buffer = function() {
               data.data[i][j] = '&nbsp;<div class="cellcontent">' + compiled_templates[j](data.objects[i]) + '</div>';
             }
           }
+          // find out the best buffer to replace (metric is offset distance)
           var replace = grid.getReplacementBufferIndexForOffset(data['offset']);
           grid.buffers[replace] = data;
           // resize scrollproxy size if neccesary

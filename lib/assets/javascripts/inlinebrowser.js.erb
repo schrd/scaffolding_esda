@@ -183,6 +183,7 @@
               inhalt.html("");
             });
             jQuery(this).registerModifications();
+            inhalt.trigger("scaffolding:inlinenew:inserted");
           }
         });
         inhalt.show();
