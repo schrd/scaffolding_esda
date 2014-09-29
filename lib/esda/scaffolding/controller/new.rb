@@ -34,6 +34,9 @@ module Esda::Scaffolding::Controller::New
         recursively_save_created_objects(@instance, created_objects)
       end
       # @instance.save!
+      if respond_to?(:after_create)
+        after_create(@instance, created_objects)
+      end
       flash[:notice] = "Datensatz gespeichert"
       if params.has_key?(:redirect_to)
         return(redirect_to(params[:redirect_to]))
