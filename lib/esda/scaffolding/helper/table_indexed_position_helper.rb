@@ -25,7 +25,7 @@ module Esda::Scaffolding::Helper::TableIndexedPositionHelper
         posision_index_association = possible_associations.first
       end
     end
-    index_model.find(:all, :order=>options[:index_order], :conditions=>options[:index_conditions]).map{|index_instance|
+    index_model.order(options[:index_order]).where(options[:index_conditions]).map{|index_instance|
       tbl, empty = indexed_table(position_model, instance, instance.class.primary_key , index_instance, posision_index_association, position_reverse_assoc) 
       new_pos = ""
       multi = if multiple.is_a?(Symbol)
@@ -48,9 +48,7 @@ module Esda::Scaffolding::Helper::TableIndexedPositionHelper
   end
 
   def indexed_table(model, head_instance, head_field, index_instance, index_assoc, position_reverse_assoc)
-    instances = model.find(:all, 
-                           :conditions=>["#{head_field}=? and #{index_assoc.foreign_key}=?", head_instance.id, index_instance.id], 
-                           :order=>model.scaffold_select_order)
+    instances = model.where(["#{head_field}=? and #{index_assoc.foreign_key}=?", head_instance.id, index_instance.id]).order(model.scaffold_select_order).all
     if instances.size == 0
       return content_tag('div', "Keine Positionen"), true
     end

@@ -98,7 +98,7 @@ module ActionView
         if reflection.klass.scaffold_use_auto_complete
           scaffold_text_field_with_auto_complete(record, foreign_key, reflection.klass.name.underscore, options)
         else
-          items = reflection.klass.find(:all, :order => reflection.klass.scaffold_select_order, :conditions=>reflection.options[:conditions], :include=>reflection.klass.scaffold_include, :limit=>100)
+          items = reflection.klass.order(reflection.klass.scaffold_select_order).where(reflection.options[:conditions]).includes(reflection.klass.scaffold_include).limit(100)
           items.sort! {|x,y| x.scaffold_name <=> y.scaffold_name} if reflection.klass.scaffold_include
           # include a blank entry only if the column is nullable
           select(record, foreign_key, items.collect{|i| [i.scaffold_name, i.id]}, {:include_blank=>null}, options) +

@@ -272,7 +272,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
       myclass = record_class.reflect_on_association(column_name.to_sym).klass
       select_tag "#{prefix}[#{record_name}][#{column}]", 
         options_for_select([["egal", ""]] + 
-          myclass.find(:all, :order => myclass.scaffold_select_order).collect {|elem| [elem.scaffold_name, elem.id]}
+          myclass.order(myclass.scaffold_select_order).collect {|elem| [elem.scaffold_name, elem.id]}
         )
           elsif value and desc
             options  = content_tag('option', desc, {'value'=>value})

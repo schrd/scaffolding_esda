@@ -7,7 +7,7 @@ module Esda::Scaffolding::Controller::ConditionalFinder
   # Use it like this:
   #
   #   conditions, condition_params = build_conditions(MyModel, params[MyModel.name.underscore])
-  #   results = MyModel.find(:all, :conditions=>[conditions.join(" AND "), *condition_params])
+  #   results = MyModel.where([conditions.join(" AND "), *condition_params])
   #
   # The method does know how to traverse +belongs_to+ hierarchies as defined in
   # +scaffold_browse_fields+, so parameters such as <tt>my_model[other_model.fieldA]</tt> are handled correctly
