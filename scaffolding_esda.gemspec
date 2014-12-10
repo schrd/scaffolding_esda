@@ -21,6 +21,10 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.25"
   s.summary = "An extended scaffolding extension extracted from Esda ERP system"
+  s.add_runtime_dependency 'fast_gettext'
+  s.add_dependency "railties", "~> 4.1.0"
+  s.add_runtime_dependency "handlebars"
+  s.add_runtime_dependency "jquery-ui-rails"
 
 end
 
