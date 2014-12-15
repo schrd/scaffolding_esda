@@ -3,6 +3,25 @@ module Esda
     module Helper
     end
     module Controller
+      def self.can_use_window_functions?
+        # querying AR is done only once
+        if @window_functions_initialized
+          return @can_use_window_functions
+        else
+          begin
+            @window_functions_initialized = true
+            if ActiveRecord::Base.configurations[Rails.env]["adapter"]=="postgresql"
+              @can_use_window_functions = true
+            else
+              @can_use_window_functions = false
+            end
+            return @can_use_window_functions
+          rescue
+            @can_use_window_functions = false
+            return false
+          end
+        end
+      end
     end
     module Rails
       class Engine < ::Rails::Engine

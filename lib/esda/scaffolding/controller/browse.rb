@@ -69,12 +69,16 @@ module Esda::Scaffolding::Controller::Browse
       @daten = model.browse_find(:conditions=>[conditions.join(" AND "), *condition_params], :offset=>params[:offset].to_i, :limit=>params[:limit].to_i, :order=>order)
     else
       # try to count records from window function. saves one call to database
-      if Rails::VERSION::MAJOR < 3 and jd
+      if Rails::VERSION::MAJOR < 3 and jd and Esda::Scaffolding::Controller.can_use_window_functions?
         cols = model.send(:column_aliases, jd) + ", count(*) over () as browse_total_count"
       elsif Rails::VERSION::MAJOR >= 3 and jd
         cols = jd.columns
       else
-        cols = "*, count(*) over () as browse_total_count"
+        if Esda::Scaffolding::Controller.can_use_window_functions?
+          cols = "*, count(*) over () as browse_total_count"
+        else
+          cols = "*"
+        end
       end
       @daten = model.includes(browse_include_field2_data[0]).where([conditions.join(" AND "), *condition_params]).offset(params[:offset].to_i).limit(params[:limit].to_i).order(order).select(cols)
       begin
