@@ -80,7 +80,12 @@ module Esda::Scaffolding::Controller::Browse
           cols = "*"
         end
       end
-      @daten = model.includes(browse_include_field2_data[0]).where([conditions.join(" AND "), *condition_params]).offset(params[:offset].to_i).limit(params[:limit].to_i).order(order).select(cols)
+      
+      relation = model.references(browse_include_field2_data[0])
+      relation = relation.includes(browse_include_field2_data[0])
+      relation = relation.where([conditions.join(" AND "), *condition_params])
+      relation = relation.offset(params[:offset].to_i).limit(params[:limit].to_i).order(order).select(cols)
+      @daten = relation
       begin
       @count = @daten.first.try(:browse_total_count)
       rescue NoMethodError=>ignored
