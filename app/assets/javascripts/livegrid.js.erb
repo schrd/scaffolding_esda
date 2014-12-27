@@ -26,6 +26,13 @@ function getScrollBarWidth () {
 };
 
 function LiveGrid(element, options) {
+  if (element.grid) {
+    try {
+      console.log("double livegrid initialization")
+    } catch(e) {
+    }
+    return;
+  }
   element.grid = this;
   element.className = element.className + " livegrid";
   this.options = options;
