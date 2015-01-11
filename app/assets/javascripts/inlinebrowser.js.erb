@@ -142,7 +142,7 @@
         if (loaded==false) {
           var url2 = url;
           if (sel.val() != null)
-            url2 = url + "/" + sel.val();
+            url2 = url.replace("{{id}}", sel.val());
           dlginhalt.load(url2, null, function(responseText, textStatus, xhr) {
             if (xhr.status==200) {
               jQuery(this).find(".inlineshow").inlineshow({});

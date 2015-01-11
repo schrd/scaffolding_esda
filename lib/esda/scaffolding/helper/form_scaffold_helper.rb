@@ -259,6 +259,7 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
           editlink = "".html_safe
         end
         if count < 100 and (model.scaffold_column_options(field.to_s)['custom_renderer'] != :hidden_inline_browser rescue true)
+          canary = 12345678901234567890
           return content_tag('div', 
             association_select_tag(record, assoc, conditions, condition_params, name_prefix, css_class) + 
               content_tag('span', '', 
@@ -266,8 +267,9 @@ module Esda::Scaffolding::Helper::FormScaffoldHelper
                 :title=>"#{assoc.klass.scaffold_model_name} anzeigen",
                 :url=>url_for(
                   :controller=>assoc.klass.name.underscore, 
-                  :action=>'show' 
-                )
+                  :action=>'show',
+                  :id=>canary
+                ).gsub(canary.to_s, h("{{id}}")).html_safe
               ) + inlinenew + editlink,
               :class=>'association'
             )

@@ -107,10 +107,11 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
 
   def header_fields_for(model_class)
     return self.send("#{model_class.name.underscore}_header_fields".to_sym, model_class) if respond_to?("#{model_class.name.underscore}_header_fields".to_sym)
-    links = link_to(image_tag('filefind.png'), url_for(:action=>'show') + h("/{{#{model_class.primary_key}}}"), :title=>'Anzeigen') +
-            link_to(image_tag('edit.png'), url_for(:action=>'edit') + h("/{{#{model_class.primary_key}}}"), :title=>'Bearbeiten') +
+    canary = 12345678901234567890
+    links = link_to(image_tag('filefind.png'), url_for(:action=>'show', :id=>canary).gsub(canary.to_s, h("{{#{model_class.primary_key}}}")), :title=>'Anzeigen') +
+            link_to(image_tag('edit.png'), url_for(:action=>'edit', :id=>canary).gsub(canary.to_s, h("{{#{model_class.primary_key}}}")), :title=>'Bearbeiten') +
             link_to(image_tag('editcopy.png'), url_for(:action=>'new') + h("?clone_from={{#{model_class.primary_key}}}"), :title=>'Kopieren') +
-            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy') + h("/{{#{model_class.primary_key}}}"), :title=>'Löschen', :onclick=>"return(confirm('{{scaffold_name}} wirklich löschen?'))") +
+            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy', :id=>canary).gsub(canary.to_s, h("{{#{model_class.primary_key}}}")), :title=>'Löschen', :onclick=>"return(confirm('{{scaffold_name}} wirklich löschen?'))") +
             has_many_links(model_class)
  		([[h(_('Links')), '<a class="button searchbutton">Suchen</a>'.html_safe, nil, nil, links]] +
 		model_class.scaffold_browse_fields.map{|f|
@@ -316,8 +317,9 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     else
       assoc = mc.reflect_on_association(field.split(".").last.to_sym)
       if assoc
+        canary = 12345678901234567890
         id_field = field + ".id"
-        link_to(h("{{#{field}.scaffold_name}}"), url_for(:action=>'show', :controller=>assoc.klass.name.underscore)+ h("/{{#{id_field}}}"))
+        link_to(h("{{#{field}.scaffold_name}}"), url_for(:action=>'show', :controller=>assoc.klass.name.underscore, :id=>canary).gsub(canary.to_s, h("{{#{id_field}}}")))
       else
         h("{{#{field}}}")
       end
