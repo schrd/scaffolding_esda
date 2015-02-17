@@ -14,7 +14,7 @@
   font-weight: bold;
 }
 .scrolltable tr.resizable td {
-  background: url(/assets/resize2.gif) repeat-y right;
+  border-right: ridge 3px #ccc;
 }
 .scrolltable tr.head td>div, .scrolltable tr.head td>div:hover {
   position:static;
@@ -34,13 +34,13 @@
   z-index:0;
   border: solid 1px #ccc;
   text-align: left;
-  background: url(<%= image_path("ecke_rechts_unten.png") %>) right bottom no-repeat;
+  background: url(<%= asset_path("ecke_rechts_unten.png") %>) right bottom no-repeat;
 }
 .scrolltable td.ASC>div {
-	background: url(<%= image_path("1uparrow.png") %>) right center no-repeat;
+	background: url(<%= asset_path("1uparrow.png") %>) right center no-repeat;
 }
 .scrolltable td.DESC>div {
-	background: url(<%= image_path("1downarrow.png") %>) right center no-repeat;
+	background: url(<%= asset_path("1downarrow.png") %>) right center no-repeat;
 }
 .scrolltable td>div, .scrolltable th>div {
   overflow: hidden;

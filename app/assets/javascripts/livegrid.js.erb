@@ -64,7 +64,7 @@ function LiveGrid(element, options) {
   this.buildTable();
   this.table.style.direction = 'ltr';
   this.loadingDiv = document.createElement("div");
-  this.loadingDiv.innerHTML = '<span style="background-color: #888; -moz-opacity: 1; border: solid black thin; margin: auto; height:3em; position:absolute; top:0px; bottom: 0px;">loading data...<br/><%= image_tag("mozilla_blu.gif") %></span>';
+  this.loadingDiv.innerHTML = '<span style="background-color: #888; -moz-opacity: 1; border: solid black thin; margin: auto; height:3em; position:absolute; top:0px; bottom: 0px;">loading data...<br/><%= image_path("mozilla_blu.gif") %></span>';
   this.loadingDiv.style.visibility = "hidden";
   this.loadingDiv.style.position = "absolute";
   this.loadingDiv.style.left = "0px";
