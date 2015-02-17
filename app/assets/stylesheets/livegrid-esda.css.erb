@@ -82,3 +82,20 @@
 .scrollable {
   z-index: 4;
 }
+
+.cellcontent>div.hasmanyassociations {
+  display: inline;
+  position: relative;
+}
+.cellcontent>div.hasmanyassociations>div.associationslist {
+  position:absolute;
+  left: 10px;
+  background-color: #ccc;
+  visibility: hidden;
+  border: solid black 1px;
+  padding: 5px;
+  border-radius: 0px 10px 10px 10px;
+}
+.cellcontent>div.hasmanyassociations:hover>div.associationslist {
+  visibility: visible;
+}
