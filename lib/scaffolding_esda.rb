@@ -3,6 +3,14 @@ module Esda
     module Helper
     end
     module Controller
+      mattr_accessor :scaffold_layout
+      def self.scaffold_layout
+        if @@scaffold_layout
+          return @@scaffold_layout
+        else
+          return 'esda'
+        end
+      end
       def self.can_use_window_functions?
         # querying AR is done only once
         if @window_functions_initialized

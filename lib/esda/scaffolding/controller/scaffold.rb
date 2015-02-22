@@ -8,7 +8,7 @@ module Esda::Scaffolding::Controller
       if self.respond_to?(:set_legacy_vars, true)
         set_legacy_vars
       end
-      layout = request.xhr? ? false : 'esda'
+      layout = request.xhr? ? false : Esda::Scaffolding::Controller.scaffold_layout
       if Rails::VERSION::MAJOR == 1
         if template_exists?("#{self.class.controller_path}/#{action}")
           render(options.merge({:action=>action, :layout=>layout}))
