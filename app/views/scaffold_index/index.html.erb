@@ -1,0 +1,5 @@
+<ul>
+<% @resource_models.each do |m| %>
+<li><%= link_to m.name, {:controller=>m.name.underscore, :action=>'index'} %></li>
+<% end %>
+</ul>
