@@ -20,3 +20,11 @@
 	border-bottom: solid red 1px;
 	background-color: #FFECD7;
 }
+
+ul.scaffold-navigation {
+  display: block;
+}
+ul.scaffold-navigation>li {
+  display: inline-block;
+  list-style: none;
+}

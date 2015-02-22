@@ -3,6 +3,12 @@
 <%= stylesheet_link_tag "application" %>
 </head>
 <body>
+<nav>
+<ul class="scaffold-navigation">
+<li><%= link_to(h(_('Home')), '/') %></li>
+<%= scaffold_models_list %>
+</ul>
+</nav>
 <%= yield %>
 <%= javascript_include_tag "application" %>
 <%= content_for :scripts %>
