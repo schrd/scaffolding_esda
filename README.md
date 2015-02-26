@@ -1,0 +1,42 @@
+Esda Scaffolding Extension for Ruby on Rails
+============================================
+
+This gem provides a user interface to database tables. It is an extract of an
+inhouse ERP system developed at Esda.
+
+Outstanding features are:
+
+- it can handle millions of records in a sinlge table without pagination.
+- it can handle lots of tables. At Esda it is used with hundreds of them in a single application.
+- it offers nested creation of dependent records in a single transaction.
+- it can handle media data stored in columns, such as pictures or pdf documents.
+- it handles all relationships that rails models offer:
+  - belongs_to
+  - has_many
+  - has_and_belongs_to_many
+- data browsing: you can quickly navigate through relationships
+
+Quickstart
+==========
+
+It is a good idea to use the application template as the extension has some dependencies:
+
+    rails new my_scaffolding_app -m "https://www.gitorious.org/scaffolding_esda/scaffolding_esda/raw/ror4.1:app_template/scaffolding_app_template.rb"
+    cd my_scaffolding_app
+    rake db:migrate
+    rails s
+    # open http://localhost:3000/
+
+- Create some models, edit the migrations to add not null constraints for attributes that cannot be empty. The extension can handle this.
+- add relationships between the models
+- create a controller for each model:
+
+
+    class ProductController < ApplicationController
+      scaffold :product
+    end
+
+- add a route: scaffold_resource :product
+- you will probably want to modify the generated user model
+
+
