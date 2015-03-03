@@ -14,6 +14,7 @@ module Esda::Scaffolding::Routing
       end
       member do
         get 'download'
+        get 'download_column'
         get 'history'
       end
     end
