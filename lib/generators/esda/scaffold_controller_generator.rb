@@ -6,6 +6,7 @@ class #{class_name}Controller < ApplicationController
   scaffold :#{file_name}
 end
     FILE
+    route "scaffold_resource :#{file_name}"
   end
 end
 end
