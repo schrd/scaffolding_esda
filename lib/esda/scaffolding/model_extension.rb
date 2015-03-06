@@ -57,6 +57,13 @@ module Esda::Scaffolding::Model
     }
   end
 
+  def scaffold_name
+    if self.respond_to?(:name)
+      return self.name
+    end
+    return self.to_s
+  end
+
   # all methods of this module are added to ActiveRecord::Base
   module ClassMethods
     attr_accessor :scaffold_select_order
