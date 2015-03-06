@@ -8,13 +8,20 @@ class Esda::Scaffolding::AccessToken
   def self.data_for(instance, column)
     data = "#{instance.class.name}.#{instance.id}.#{column}"
   end
+  def self.secret_token
+    if Rails::VERSION::MAJOR >= 4 and Rails::VERSION::MINOR >= 1
+      pwd = Rails.application.secrets.secret_token
+    else
+      pwd = Rails.application.config.secret_token
+    end
+    return pwd
+  end
   def self.download_token_for(instance, column)
     data = data_for(instance, column)
-    pwd = Rails.application.config.secret_token
     cipher = OpenSSL::Cipher.new 'AES-128-CBC'
     cipher.encrypt
     iv = cipher.random_iv
-
+    pwd = secret_token()
     salt = OpenSSL::Random.random_bytes 8
     iter = 20000
     key_len = cipher.key_len
@@ -36,7 +43,8 @@ class Esda::Scaffolding::AccessToken
   def self.verify_download_token_for(instance, column, token)
     salt, encrypted, iv = token.split(":").map{|v| Base64.strict_decode64 v}
     raise InvalidTokenFormat, "" if salt.nil? or encrypted.nil? or iv.nil?
-    pwd = Rails.application.config.secret_token
+    #pwd = Rails.application.config.secret_token
+    pwd = secret_token()
     cipher = OpenSSL::Cipher.new 'AES-128-CBC'
     cipher.decrypt
     cipher.iv = iv # the one generated with #random_iv
