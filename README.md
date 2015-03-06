@@ -40,3 +40,10 @@ It is a good idea to use the application template as the extension has some depe
 - you will probably want to modify the generated user model
 
 
+Customize your models
+=====================
+
+- implement a scaffold_name method in each model. The return value of this method is used whenever your your model instance is displayed, such as in displaying a belongs_to association
+- add a @scaffold_browse_fiels variable. It should be a list that contains the fields shown for browsing. Default: all fields in the model
+- add a @scaffold_fields variable. It should be a list that contains the fields shown in edit/show/new forms
+- you might want to implement a <fieldname>_immutable? method. If it returns true, the field value cannot be changed in edit forms
