@@ -111,7 +111,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
     links = link_to(image_tag('filefind.png'), url_for(:action=>'show', :id=>canary).gsub(canary.to_s, h("{{#{model_class.primary_key}}}")), :title=>'Anzeigen') +
             link_to(image_tag('edit.png'), url_for(:action=>'edit', :id=>canary).gsub(canary.to_s, h("{{#{model_class.primary_key}}}")), :title=>'Bearbeiten') +
             link_to(image_tag('editcopy.png'), url_for(:action=>'new') + h("?clone_from={{#{model_class.primary_key}}}"), :title=>'Kopieren') +
-            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy', :id=>canary).gsub(canary.to_s, h("{{#{model_class.primary_key}}}")), :title=>'Löschen', :onclick=>"return(confirm('{{scaffold_name}} wirklich löschen?'))") +
+            link_to(image_tag('editdelete.png'), url_for(:action=>'destroy', :id=>canary).gsub(canary.to_s, h("{{#{model_class.primary_key}}}")), :title=>'Löschen', :"data-confirm"=>"{{scaffold_name}} wirklich löschen?", :method=>:delete) +
             has_many_links(model_class)
  		([[h(_('Links')), '<a class="button searchbutton">Suchen</a>'.html_safe, nil, nil, links]] +
 		model_class.scaffold_browse_fields.map{|f|
