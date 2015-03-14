@@ -66,10 +66,15 @@ module Esda::Scaffolding::Controller::RecursiveCreator
     }
     if params_part
       found = params_part.find_all{|k,v| v.is_a?(String) || v.is_a?(Numeric)}.to_a
+      file_uploads = params_part.find_all{|k,v| v.respond_to?(:read)}.to_a
     else
       found = []
     end
     instance.attributes = Hash[*found.flatten]
+    file_uploads.each{|k,v|
+      instance.send("#{k}=", v.read)
+    }
+    
     instance.valid?
     created_objects.each{|method, obj|
       #if not obj.valid?
