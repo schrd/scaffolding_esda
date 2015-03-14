@@ -54,7 +54,7 @@ module Esda::Scaffolding::Helper::ScaffoldHelper
           value = entry.send(column).respond_to?(:scaffold_name) ? entry.send(column).scaffold_name : entry.send(column)
         end
         return link_to(h(value), :action=>'show', :controller=>reflection.class_name.underscore.to_s, :id=>id) if value and link
-        return h(value.to_s) + content_tag('span', h(''), :class=>'inlineshow', :url=>url_for(:action=>'show', :controller=>"/"+reflection.class_name.underscore.to_s, :id=>id), :title=>reflection.class_name.humanize) if not link 
+        return h(value.to_s) + content_tag('span', h(''), :class=>'inlineshow', :url=>url_for(:action=>'show', :controller=>"/"+reflection.class_name.underscore.to_s, :id=>id), :title=>reflection.class_name.humanize) if not link and id
         return h("")
       end
     else
