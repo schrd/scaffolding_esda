@@ -21,9 +21,11 @@ Quickstart
 
 It is a good idea to use the application template as the extension has some dependencies:
 
-    rails new my_scaffolding_app -m "https://www.gitorious.org/scaffolding_esda/scaffolding_esda/raw/ror4.1:app_template/scaffolding_app_template.rb"
+    rails new my_scaffolding_app -m "https://raw.githubusercontent.com/schrd/scaffolding_esda/master/app_template/scaffolding_app_template.rb"
     cd my_scaffolding_app
+    # if you are on rails 4.1 run   rails generate esda:setup_scaffolding
     rake db:migrate
+    rake db:seed
     rails s
     # open http://localhost:3000/
 
@@ -36,6 +38,7 @@ It is a good idea to use the application template as the extension has some depe
       scaffold :product
     end
 
+- include include Esda::Scaffolding::Routing to config/routes.rb
 - add a route: scaffold_resource :product
 - you will probably want to modify the generated user model
 
