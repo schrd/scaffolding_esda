@@ -143,3 +143,42 @@ Then add this helper:
         to_number_search_field_tag(record_name, param_column_name, prefix, value, options)
       end
     end
+
+Customizing the Controller
+==========================
+
+A controller usually looks like this:
+
+    class OrderController < ApplicationController
+      scaffold :order
+    end
+
+The scaffold method adds the following helpers to your controller:
+- Esda::Scaffolding::Helper::FormScaffold
+- Esda::Scaffolding::Helper::Scaffold
+- Esda::Scaffolding::Helper::History
+
+The following modules are included that implement action handling
+- Esda::Scaffolding::Controller::Browse
+- Esda::Scaffolding::Controller::New
+- Esda::Scaffolding::Controller::Edit
+- Esda::Scaffolding::Controller::Show
+- Esda::Scaffolding::Controller::Destroy
+
+If no options are provided all of these modules are included. If you want to limit the modules to include, it can be done with the :only parameter
+
+    class OrderController < ApplicationController
+      scaffold :order, :only=>[:browse, :new]
+    end
+
+If you want to scaffold a UI for has_and_belongs_to_many associations, add the :habtm option
+
+    class Product < ActiveRecord
+      has_and_belongs_to_many :tags
+    end
+
+    class ProductController < ApplicationController
+      scaffold :product, :habtm=>[:tags]
+    end
+
+
